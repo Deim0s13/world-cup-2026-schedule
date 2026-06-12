@@ -1,0 +1,21 @@
+{
+  "name": "Japan",
+  "capital": "Tokyo",
+  "population": 126529100,
+  "area": 377829,
+  "region": "Asia",
+  "languages": [
+    "Ainu",
+    "Chinese",
+    "English",
+    "Japanese",
+    "Korean",
+    "Philippene Languages"
+  ],
+  "currency": "Japanese Yen (JPY)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": null,
+  "nationalDish": "Sushi, Japanese curry,Ramen",
+  "drivingSide": "left",
+  "lifeExpectancy": 80.7
+}

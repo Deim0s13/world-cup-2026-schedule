@@ -1,0 +1,21 @@
+{
+  "name": "Ghana",
+  "capital": "Accra",
+  "population": 29767108,
+  "area": 238533,
+  "region": "Africa",
+  "languages": [
+    "Akan",
+    "Ewe",
+    "Ga-adangme",
+    "Gurma",
+    "Joruba",
+    "Mossi"
+  ],
+  "currency": "Ghanaian Cedi (GHS)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Fufu",
+  "drivingSide": "right",
+  "lifeExpectancy": 57.4
+}

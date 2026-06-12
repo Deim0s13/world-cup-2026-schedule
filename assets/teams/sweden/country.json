@@ -1,0 +1,21 @@
+{
+  "name": "Sweden",
+  "capital": "Stockholm",
+  "population": 10175214,
+  "area": 449964,
+  "region": "Europe",
+  "languages": [
+    "Arabic",
+    "Finnish",
+    "Norwegian",
+    "Southern Slavic Languages",
+    "Spanish",
+    "Swedish"
+  ],
+  "currency": "Swedish Krona (SEK)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Köttbullar, Kräftskiva,Surströmming,Ostkaka",
+  "drivingSide": "right",
+  "lifeExpectancy": 79.6
+}

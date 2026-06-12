@@ -89,6 +89,33 @@ Set your macOS wallpaper to a solid `#0c1713` so the page background matches sea
 launchctl unload ~/Library/LaunchAgents/dev.YOUR_USERNAME.wallchart-server.plist
 ```
 
+## Team profiles
+
+Click any team name, in match cards, group tables, or the standings strip, to open a team profile popup with:
+
+- Squad roster arranged on a CSS football pitch in inferred formation
+- Player mugshots with caps, goals, club, age on hover
+- Country demographics (population, capital, languages, government)
+- National anthem with audio player and collapsible lyrics/subtitles
+- Link to the FIFA team page
+
+## Asset management
+
+Team data (rosters, country info, flags, anthems) is pre-cached in `assets/teams/`. Download before first use:
+
+```bash
+python3 download_assets.py          # all 48 teams
+python3 download_assets.py --team mexico   # single team
+python3 download_assets.py --force         # re-download existing
+python3 download_assets.py --dry-run       # preview without writing
+python3 download_assets.py --anthems-only  # anthems only
+python3 download_assets.py --photos-only   # player photos only
+```
+
+Anthem audio is sourced from YouTube via an Invidious proxy. Set the `INVIDIOUS_URL` environment variable to point to your Invidious instance. Player photos from TheSportsDB with Wikipedia fallback; players without photos show a position-coloured silhouette.
+
+The app falls back to live APIs (Wikipedia, GeoAPI.info, Wikidata) if local assets are missing.
+
 ## Data sources
 
 | Data | Source |

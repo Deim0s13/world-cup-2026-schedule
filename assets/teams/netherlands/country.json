@@ -1,0 +1,19 @@
+{
+  "name": "Netherlands",
+  "capital": "Amsterdam",
+  "population": 17231624,
+  "area": 41526,
+  "region": "Europe",
+  "languages": [
+    "Arabic",
+    "Dutch",
+    "Fries",
+    "Turkish"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Stamppot, hutspot",
+  "drivingSide": "right",
+  "lifeExpectancy": 78.3
+}

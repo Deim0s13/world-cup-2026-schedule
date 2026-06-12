@@ -1,0 +1,21 @@
+{
+  "name": "Germany",
+  "capital": "Berlin",
+  "population": 82905782,
+  "area": 357022,
+  "region": "Europe",
+  "languages": [
+    "German",
+    "Greek",
+    "Italian",
+    "Polish",
+    "Southern Slavic Languages",
+    "Turkish"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Currywurst, Sauerbraten, Bratwurst",
+  "drivingSide": "right",
+  "lifeExpectancy": 77.4
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Qatar",
+  "capital": "Doha",
+  "population": 2781677,
+  "area": 11000,
+  "region": "Asia",
+  "languages": [
+    "Arabic",
+    "Urdu"
+  ],
+  "currency": "Qatari Rial (QAR)",
+  "governmentType": "Monarchy",
+  "religion": "Islam",
+  "nationalDish": null,
+  "drivingSide": "right",
+  "lifeExpectancy": 72.4
+}

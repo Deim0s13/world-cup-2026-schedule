@@ -1,0 +1,21 @@
+{
+  "name": "France",
+  "capital": "Paris",
+  "population": 66977107,
+  "area": 551500,
+  "region": "Europe",
+  "languages": [
+    "Arabic",
+    "French",
+    "Italian",
+    "Portuguese",
+    "Spanish",
+    "Turkish"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Crêpe, Pot-au-feu, Macaron, Bisque",
+  "drivingSide": "right",
+  "lifeExpectancy": 78.8
+}

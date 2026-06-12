@@ -1,0 +1,19 @@
+{
+  "name": "Switzerland",
+  "capital": "Bern",
+  "population": 8513227,
+  "area": 41284,
+  "region": "Europe",
+  "languages": [
+    "French",
+    "German",
+    "Italian",
+    "Romansh"
+  ],
+  "currency": "Swiss Franc (CHF)",
+  "governmentType": "Federation",
+  "religion": "Christianity",
+  "nationalDish": "Cervelat,Fondue, Rösti",
+  "drivingSide": "right",
+  "lifeExpectancy": 79.6
+}

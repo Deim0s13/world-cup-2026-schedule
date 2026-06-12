@@ -1,0 +1,19 @@
+{
+  "name": "Spain",
+  "capital": "Madrid",
+  "population": 46796540,
+  "area": 505992,
+  "region": "Europe",
+  "languages": [
+    "Basque",
+    "Catalan",
+    "Galecian",
+    "Spanish"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Tortilla española",
+  "drivingSide": "right",
+  "lifeExpectancy": 78.8
+}

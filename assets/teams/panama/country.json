@@ -1,0 +1,21 @@
+{
+  "name": "Panama",
+  "capital": "Ciudad de Panamá",
+  "population": 4176873,
+  "area": 75517,
+  "region": "North America",
+  "languages": [
+    "Arabic",
+    "Creole English",
+    "Cuna",
+    "Embera",
+    "Guaym√≠",
+    "Spanish"
+  ],
+  "currency": "Panamanian Balboa (PAB)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Sancocho de gallina",
+  "drivingSide": "right",
+  "lifeExpectancy": 75.5
+}

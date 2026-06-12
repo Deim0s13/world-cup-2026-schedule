@@ -1,0 +1,17 @@
+{
+  "name": "Morocco",
+  "capital": "Rabat",
+  "population": 36029138,
+  "area": 446550,
+  "region": "Africa",
+  "languages": [
+    "Arabic",
+    "Berberi"
+  ],
+  "currency": "Moroccan Dirham (MAD)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Islam",
+  "nationalDish": "Couscous, Tagine",
+  "drivingSide": "right",
+  "lifeExpectancy": 69.1
+}

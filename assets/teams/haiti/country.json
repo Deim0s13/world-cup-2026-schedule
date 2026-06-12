@@ -1,0 +1,17 @@
+{
+  "name": "Haiti",
+  "capital": "Port-au-Prince",
+  "population": 11123176,
+  "area": 27750,
+  "region": "North America",
+  "languages": [
+    "French",
+    "Haiti Creole"
+  ],
+  "currency": "Haitian Gourde (HTG)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Red beans and rice",
+  "drivingSide": "right",
+  "lifeExpectancy": 49.2
+}

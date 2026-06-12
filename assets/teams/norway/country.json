@@ -1,0 +1,20 @@
+{
+  "name": "Norway",
+  "capital": "Oslo",
+  "population": 5311916,
+  "area": 323877,
+  "region": "Europe",
+  "languages": [
+    "Danish",
+    "English",
+    "Norwegian",
+    "Saame",
+    "Swedish"
+  ],
+  "currency": "Norwegian Krone (NOK)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Fårikål",
+  "drivingSide": "right",
+  "lifeExpectancy": 78.7
+}

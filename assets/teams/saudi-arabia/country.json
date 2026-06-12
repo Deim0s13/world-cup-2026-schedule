@@ -1,0 +1,16 @@
+{
+  "name": "Saudi Arabia",
+  "capital": "Riyadh",
+  "population": 33699947,
+  "area": 2149690,
+  "region": "Asia",
+  "languages": [
+    "Arabic"
+  ],
+  "currency": "Saudi Riyal (SAR)",
+  "governmentType": "Monarchy",
+  "religion": "Islam",
+  "nationalDish": "Kabsa",
+  "drivingSide": "right",
+  "lifeExpectancy": 67.8
+}

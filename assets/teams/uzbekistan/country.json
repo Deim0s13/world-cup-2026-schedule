@@ -1,0 +1,21 @@
+{
+  "name": "Uzbekistan",
+  "capital": "Toskent",
+  "population": 32955400,
+  "area": 447400,
+  "region": "Asia",
+  "languages": [
+    "Karakalpak",
+    "Kazakh",
+    "Russian",
+    "Tadzhik",
+    "Tatar",
+    "Uzbek"
+  ],
+  "currency": "Uzbekistan Sum (UZS)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "O'sh",
+  "drivingSide": "right",
+  "lifeExpectancy": 63.7
+}

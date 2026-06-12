@@ -86,6 +86,7 @@ button{font-family:inherit;cursor:pointer}
 .kickoff .k-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--chalk-faint)}
 .kickoff .k-time{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--chalk);font-variant-numeric:tabular-nums}
 .kickoff .k-match{font-size:13px;color:var(--chalk-dim)}
+.kickoff .k-facts{display:block;font-family:var(--font-body);font-size:12px;color:var(--chalk-faint);font-style:italic;margin-top:8px;line-height:1.5;max-width:52ch}
 
 /* ---------- live banner (expanded) ---------- */
 .kickoff.live{display:block;padding:16px 20px}
@@ -355,6 +356,280 @@ footer .mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;te
   font-family:var(--font-mono);font-size:10px;color:var(--chalk-faint);
   padding:2px 6px;border:1px solid var(--line);border-radius:4px;
 }
+/* ---------- team profile dialog ---------- */
+#teamDialog{
+  border:none;border-radius:var(--radius);padding:0;
+  max-width:min(95vw,900px);max-height:90vh;
+  width:min(95vw,900px);
+  background:var(--pitch);color:var(--chalk);
+  overflow:hidden;
+}
+#teamDialog[open]{
+  display:flex;flex-direction:column;
+}
+#teamDialog::backdrop{background:rgba(0,0,0,.65);backdrop-filter:blur(5px)}
+.td-header{
+  display:flex;align-items:center;gap:14px;padding:18px 20px 14px;
+  border-bottom:2px solid var(--line);flex-shrink:0;
+  position:sticky;top:0;z-index:10;background:var(--pitch);
+}
+.td-team-name{font-family:var(--font-display);font-size:clamp(22px,4vw,36px);flex:1;line-height:1}
+.td-flag{border-radius:3px;flex-shrink:0;object-fit:cover}
+.td-close{
+  background:none;border:none;color:var(--chalk-dim);font-size:22px;
+  cursor:pointer;padding:6px;border-radius:6px;flex-shrink:0;line-height:1;
+}
+.td-close:hover{background:var(--pitch-2);color:var(--chalk)}
+.td-close:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.pd-close{background:none;border:none;color:var(--chalk-dim);font-size:18px;cursor:pointer;padding:4px;line-height:1}
+.td-body{overflow-y:auto;flex:1;padding:20px}
+.td-footer{
+  border-top:2px solid var(--line);padding:14px 20px;flex-shrink:0;
+  display:flex;gap:12px;align-items:center;
+}
+.td-fifa-btn{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--gold);color:var(--pitch);
+  border:none;border-radius:999px;padding:8px 18px;
+  text-decoration:none;cursor:pointer;
+}
+.td-fifa-btn:hover{opacity:.85}
+.td-loading{
+  text-align:center;padding:60px 20px;
+  font-family:var(--font-mono);color:var(--chalk-dim);font-size:13px;letter-spacing:.1em;
+}
+@media(max-width:560px){
+  #teamDialog{max-width:100vw;max-height:100vh;border-radius:0}
+  .td-body{padding:14px}
+}
+
+/* ---------- pitch layout ---------- */
+.pitch{
+  position:relative;width:100%;
+  aspect-ratio:68/105;
+  background:linear-gradient(180deg,#2a7a42 0%,#2d8c4e 50%,#2a7a42 100%);
+  border:2px solid rgba(255,255,255,.15);
+  border-radius:4px;overflow:hidden;
+  margin-bottom:20px;
+}
+/* halfway line */
+.pitch::before{
+  content:"";position:absolute;left:0;right:0;top:50%;
+  border-top:2px solid rgba(255,255,255,.25);
+}
+/* center circle */
+.pitch::after{
+  content:"";position:absolute;
+  width:27%;height:0;padding-bottom:27%;
+  border:2px solid rgba(255,255,255,.25);border-radius:50%;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.pitch-top-box,.pitch-bot-box{
+  position:absolute;left:50%;transform:translateX(-50%);
+  border:2px solid rgba(255,255,255,.25);
+  width:52%;height:16%;
+}
+.pitch-top-box{top:0}
+.pitch-bot-box{bottom:0}
+.pitch-top-six,.pitch-bot-six{
+  position:absolute;left:50%;transform:translateX(-50%);
+  border:2px solid rgba(255,255,255,.18);
+  width:26%;height:8%;
+}
+.pitch-top-six{top:0}
+.pitch-bot-six{bottom:0}
+/* center spot */
+.pitch-spot{
+  position:absolute;width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.4);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+/* formation label */
+.pitch-formation{
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.15em;
+  background:rgba(0,0,0,.45);color:rgba(255,255,255,.8);
+  padding:3px 10px;border-radius:999px;pointer-events:none;
+}
+
+/* ---------- player cards ---------- */
+.player-card{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;z-index:2;
+}
+.player-card:hover .pc-avatar{border-color:var(--gold)}
+.player-card .pc-avatar{
+  width:48px;height:48px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  overflow:hidden;background:var(--pitch-2);
+  position:relative;flex-shrink:0;
+}
+.player-card .pc-avatar img{
+  width:100%;height:100%;object-fit:cover;object-position:top;
+  display:block;
+}
+.player-card .pc-num{
+  position:absolute;top:-4px;left:-4px;
+  font-family:var(--font-mono);font-size:9px;font-weight:700;
+  background:var(--gold);color:var(--pitch);
+  border-radius:50%;width:16px;height:16px;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.player-card .pc-name{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;
+  color:var(--chalk);text-align:center;margin-top:3px;
+  max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  text-shadow:0 1px 3px rgba(0,0,0,.8);line-height:1.2;
+}
+.player-card.captain .pc-avatar{border-color:var(--gold);border-width:3px}
+
+/* stats tooltip */
+.player-card .pc-stats{
+  display:none;position:absolute;bottom:calc(100% + 6px);left:50%;
+  transform:translateX(-50%);
+  background:rgba(12,23,19,.95);border:1px solid var(--line);
+  border-radius:8px;padding:8px 10px;
+  font-family:var(--font-mono);font-size:10px;color:var(--chalk);
+  white-space:nowrap;z-index:10;pointer-events:none;
+  min-width:130px;
+}
+.player-card:hover .pc-stats,.player-card:focus .pc-stats{display:block}
+.player-card .pc-stats .ps-row{
+  display:flex;justify-content:space-between;gap:12px;padding:1px 0;
+}
+.player-card .pc-stats .ps-label{color:var(--chalk-faint)}
+
+/* silhouette fallback */
+.player-card.no-photo .pc-avatar img{display:none}
+.player-card.no-photo .pc-avatar::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 35%,var(--chalk-faint) 18%,transparent 19%),
+    radial-gradient(ellipse 55% 45% at 50% 72%,var(--chalk-faint) 100%,transparent 101%);
+}
+/* GK silhouette slightly different (gloves hint) */
+.player-card.no-photo.gk .pc-avatar::after{
+  background:radial-gradient(circle at 50% 35%,var(--gold) 18%,transparent 19%),
+    radial-gradient(ellipse 55% 45% at 50% 72%,var(--gold) 100%,transparent 101%);
+  opacity:.6;
+}
+
+/* ---------- player detail ---------- */
+.player-detail{border-top:2px solid var(--line);padding:16px 0;margin-top:12px}
+.pd-header{display:flex;gap:14px;align-items:flex-start}
+.pd-photo{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--line);flex-shrink:0}
+.pd-info{flex:1;min-width:0}
+.pd-name{font-family:var(--font-display);font-size:22px;line-height:1.1}
+.pd-meta{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--chalk-dim);margin-top:4px}
+.pd-stats{font-family:var(--font-mono);font-size:11px;color:var(--chalk-faint);margin-top:6px}
+.pd-social{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ps-social{
+  font-family:var(--font-mono);font-size:11px;
+  background:var(--pitch-2);border:1px solid var(--line);border-radius:6px;
+  padding:4px 10px;color:var(--chalk);text-decoration:none;
+}
+.ps-social:hover{background:var(--pitch-3);color:var(--gold)}
+.pd-bio{font-size:13px;color:var(--chalk-dim);line-height:1.7;margin-top:12px;max-height:120px;overflow-y:auto}
+
+/* ---------- subs strip ---------- */
+.subs-strip{
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+  padding:10px 0 4px;
+  border-top:1px solid var(--line);
+}
+.subs-strip .sub-card{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  width:40px;
+}
+.subs-strip .sub-card .pc-avatar{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.2);
+  overflow:hidden;background:var(--pitch-2);
+}
+.subs-strip .sub-card .pc-avatar img{width:100%;height:100%;object-fit:cover;object-position:top}
+.subs-strip .sub-card .pc-name{
+  font-family:var(--font-mono);font-size:8px;color:var(--chalk-faint);
+  max-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
+}
+.subs-label{
+  width:100%;text-align:center;font-family:var(--font-mono);font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-faint);
+  padding-bottom:6px;
+}
+
+/* ---------- country profile ---------- */
+.country-profile{
+  border-top:2px solid var(--line);padding-top:20px;margin-top:4px;
+}
+.cp-flag-row{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.cp-flag-row img{height:64px;border-radius:4px;border:1px solid var(--line)}
+.cp-country-name{font-family:var(--font-display);font-size:clamp(20px,3vw,28px);line-height:1}
+.cp-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px;margin-bottom:16px;
+}
+.cp-cell{background:var(--pitch-2);border-radius:8px;padding:10px 12px}
+.cp-cell .cc-label{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--chalk-faint);margin-bottom:3px;
+}
+.cp-cell .cc-val{font-size:14px;color:var(--chalk);font-family:var(--font-body);font-weight:500}
+.cp-factoids{
+  font-family:var(--font-body);font-size:13px;color:var(--chalk-dim);
+  font-style:italic;margin-bottom:16px;line-height:1.7;
+}
+.cp-factoids span{margin-right:12px}
+
+/* anthem */
+.cp-anthem{
+  display:flex;flex-direction:column;gap:6px;
+  background:var(--pitch-2);border-radius:var(--radius);padding:14px 16px;
+  margin-bottom:16px;
+}
+.cp-anthem-name{
+  font-family:var(--font-display);font-size:16px;color:var(--chalk);line-height:1;
+}
+.cp-anthem-sub{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--chalk-faint)}
+.cp-anthem audio{width:100%;margin-top:6px;height:32px;border-radius:4px}
+.td-lyrics-btn{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  background:none;border:1px solid var(--line);border-radius:999px;
+  color:var(--chalk-faint);padding:5px 14px;margin-top:6px;cursor:pointer;
+}
+.td-lyrics-btn:hover{color:var(--chalk);border-color:rgba(242,244,236,.3)}
+.td-lyrics{margin-top:10px;padding:12px 14px;background:var(--pitch-3);border-radius:8px;
+  max-height:200px;overflow-y:auto}
+
+/* ---------- pitch + player responsive ---------- */
+@media(max-width:560px){
+  .player-card .pc-avatar{width:36px;height:36px}
+  .player-card .pc-name{font-size:8px;max-width:48px}
+  .cp-grid{grid-template-columns:1fr 1fr}
+}
+.team-link{color:inherit;text-decoration:none;cursor:pointer}
+.team-link:hover{text-decoration:underline;text-underline-offset:3px;color:var(--gold)}
+
+/* ---------- loading spinner ---------- */
+.td-spinner{
+  width:32px;height:32px;border:3px solid var(--line);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .8s linear infinite;margin:20px auto;display:block;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- anecdotes ---------- */
+.cp-anecdotes{margin-bottom:16px}
+.cp-anecdotes-title{
+  font-family:var(--font-display);font-size:16px;color:var(--gold);
+  margin-bottom:8px;
+}
+.cp-anecdote{
+  font-family:var(--font-body);font-size:13px;color:var(--chalk-dim);
+  line-height:1.7;margin-bottom:8px;padding-left:14px;
+  border-left:3px solid var(--gold);
+}
 </style>
 </head>
 <body>
@@ -457,6 +732,429 @@ const VENUES={
   97:"Boston · Gillette Stadium",98:"Los Angeles · SoFi Stadium",99:"Miami · Hard Rock Stadium",
   100:"Kansas City · Arrowhead Stadium",101:"Dallas · AT&T Stadium",102:"Atlanta · Mercedes-Benz Stadium",
   103:"Miami · Hard Rock Stadium",104:"New York/NJ · MetLife Stadium"
+};
+const TEAM_META={
+  "Algeria":{slug:"algeria",iso2:"dz",flagcdn:"dz",qid:"Q262"},
+  "Argentina":{slug:"argentina",iso2:"ar",flagcdn:"ar",qid:"Q414"},
+  "Australia":{slug:"australia",iso2:"au",flagcdn:"au",qid:"Q408"},
+  "Austria":{slug:"austria",iso2:"at",flagcdn:"at",qid:"Q40"},
+  "Belgium":{slug:"belgium",iso2:"be",flagcdn:"be",qid:"Q31"},
+  "Bosnia & Herzegovina":{slug:"bosnia-and-herzegovina",iso2:"ba",flagcdn:"ba",qid:"Q225"},
+  "Brazil":{slug:"brazil",iso2:"br",flagcdn:"br",qid:"Q155"},
+  "Cabo Verde":{slug:"cabo-verde",iso2:"cv",flagcdn:"cv",qid:"Q1011"},
+  "Canada":{slug:"canada",iso2:"ca",flagcdn:"ca",qid:"Q16"},
+  "Colombia":{slug:"colombia",iso2:"co",flagcdn:"co",qid:"Q739"},
+  "Congo DR":{slug:"congo-dr",iso2:"cd",flagcdn:"cd",qid:"Q974"},
+  "Côte d'Ivoire":{slug:"cote-d-ivoire",iso2:"ci",flagcdn:"ci",qid:"Q1008"},
+  "Croatia":{slug:"croatia",iso2:"hr",flagcdn:"hr",qid:"Q224"},
+  "Curaçao":{slug:"curacao",iso2:"cw",flagcdn:"cw",qid:"Q25279"},
+  "Czechia":{slug:"czechia",iso2:"cz",flagcdn:"cz",qid:"Q213"},
+  "Ecuador":{slug:"ecuador",iso2:"ec",flagcdn:"ec",qid:"Q736"},
+  "Egypt":{slug:"egypt",iso2:"eg",flagcdn:"eg",qid:"Q79"},
+  "England":{slug:"england",iso2:"gb",flagcdn:"gb-eng",qid:"Q145"},
+  "France":{slug:"france",iso2:"fr",flagcdn:"fr",qid:"Q142"},
+  "Germany":{slug:"germany",iso2:"de",flagcdn:"de",qid:"Q183"},
+  "Ghana":{slug:"ghana",iso2:"gh",flagcdn:"gh",qid:"Q117"},
+  "Haiti":{slug:"haiti",iso2:"ht",flagcdn:"ht",qid:"Q790"},
+  "IR Iran":{slug:"ir-iran",iso2:"ir",flagcdn:"ir",qid:"Q794"},
+  "Iraq":{slug:"iraq",iso2:"iq",flagcdn:"iq",qid:"Q796"},
+  "Japan":{slug:"japan",iso2:"jp",flagcdn:"jp",qid:"Q17"},
+  "Jordan":{slug:"jordan",iso2:"jo",flagcdn:"jo",qid:"Q810"},
+  "Korea Republic":{slug:"korea-republic",iso2:"kr",flagcdn:"kr",qid:"Q884"},
+  "Mexico":{slug:"mexico",iso2:"mx",flagcdn:"mx",qid:"Q96"},
+  "Morocco":{slug:"morocco",iso2:"ma",flagcdn:"ma",qid:"Q1028"},
+  "Netherlands":{slug:"netherlands",iso2:"nl",flagcdn:"nl",qid:"Q55"},
+  "New Zealand":{slug:"new-zealand",iso2:"nz",flagcdn:"nz",qid:"Q664"},
+  "Norway":{slug:"norway",iso2:"no",flagcdn:"no",qid:"Q20"},
+  "Panama":{slug:"panama",iso2:"pa",flagcdn:"pa",qid:"Q804"},
+  "Paraguay":{slug:"paraguay",iso2:"py",flagcdn:"py",qid:"Q733"},
+  "Portugal":{slug:"portugal",iso2:"pt",flagcdn:"pt",qid:"Q45"},
+  "Qatar":{slug:"qatar",iso2:"qa",flagcdn:"qa",qid:"Q846"},
+  "Saudi Arabia":{slug:"saudi-arabia",iso2:"sa",flagcdn:"sa",qid:"Q851"},
+  "Scotland":{slug:"scotland",iso2:"gb",flagcdn:"gb-sct",qid:"Q22"},
+  "Senegal":{slug:"senegal",iso2:"sn",flagcdn:"sn",qid:"Q1041"},
+  "South Africa":{slug:"south-africa",iso2:"za",flagcdn:"za",qid:"Q258"},
+  "Spain":{slug:"spain",iso2:"es",flagcdn:"es",qid:"Q29"},
+  "Sweden":{slug:"sweden",iso2:"se",flagcdn:"se",qid:"Q34"},
+  "Switzerland":{slug:"switzerland",iso2:"ch",flagcdn:"ch",qid:"Q39"},
+  "Tunisia":{slug:"tunisia",iso2:"tn",flagcdn:"tn",qid:"Q948"},
+  "Türkiye":{slug:"turkiye",iso2:"tr",flagcdn:"tr",qid:"Q43"},
+  "Uruguay":{slug:"uruguay",iso2:"uy",flagcdn:"uy",qid:"Q77"},
+  "USA":{slug:"usa",iso2:"us",flagcdn:"us",qid:"Q30"},
+  "Uzbekistan":{slug:"uzbekistan",iso2:"uz",flagcdn:"uz",qid:"Q265"}
+};
+const TEAM_NICKNAMES = {
+  "Algeria": "Les Fennecs",
+  "Argentina": "La Albiceleste",
+  "Australia": "Socceroos",
+  "Austria": "Das Team",
+  "Belgium": "Red Devils",
+  "Bosnia & Herzegovina": "Zmajevi (Dragons)",
+  "Brazil": "Seleção",
+  "Cabo Verde": "Tubarões Azuis (Blue Sharks)",
+  "Canada": "Les Rouges / CanMNT",
+  "Colombia": "Los Cafeteros",
+  "Congo DR": "Les Léopards",
+  "Côte d'Ivoire": "Les Éléphants",
+  "Croatia": "Vatreni (The Blazers)",
+  "Curaçao": "Nos Seleccion",
+  "Czechia": "Národní Tým",
+  "Ecuador": "La Tri",
+  "Egypt": "The Pharaohs",
+  "England": "Three Lions",
+  "France": "Les Bleus",
+  "Germany": "Die Mannschaft",
+  "Ghana": "Black Stars",
+  "Haiti": "Les Grenadiers",
+  "IR Iran": "Team Melli",
+  "Iraq": "Usood Al-Rafidain (Lions of Mesopotamia)",
+  "Japan": "Samurai Blue",
+  "Jordan": "Al-Nashama",
+  "Korea Republic": "Taegeuk Warriors",
+  "Mexico": "El Tri",
+  "Morocco": "Atlas Lions",
+  "Netherlands": "Oranje",
+  "New Zealand": "All Whites",
+  "Norway": "Løvene (The Lions)",
+  "Panama": "Los Canaleros",
+  "Paraguay": "La Albirroja",
+  "Portugal": "Seleção das Quinas",
+  "Qatar": "Al-Annabi",
+  "Saudi Arabia": "The Green Falcons",
+  "Scotland": "The Tartan Army",
+  "Senegal": "Lions of Teranga",
+  "South Africa": "Bafana Bafana",
+  "Spain": "La Roja",
+  "Sweden": "Blågult",
+  "Switzerland": "Nati",
+  "Tunisia": "Eagles of Carthage",
+  "Türkiye": "Ay-Yıldızlılar (Crescent Stars)",
+  "Uruguay": "La Celeste",
+  "USA": "USMNT / Stars and Stripes",
+  "Uzbekistan": "White Wolves",
+};
+const ANTHEM_TRANSLATIONS={
+  "Algeria":["قسماً / Kassaman","We Pledge"],
+  "Argentina":["Himno Nacional Argentino","Argentine National Anthem"],
+  "Australia":["Advance Australia Fair","Advance Australia Fair"],
+  "Austria":["Bundeshymne der Republik Österreich","National Anthem of Austria"],
+  "Belgium":["La Brabançonne","The Song of Brabant"],
+  "Bosnia & Herzegovina":["Intermeco","Intermezzo"],
+  "Brazil":["Hino Nacional Brasileiro","Brazilian National Anthem"],
+  "Cabo Verde":["Cântico da Liberdade","Song of Freedom"],
+  "Canada":["O Canada","O Canada"],
+  "Colombia":["Himno Nacional de la República de Colombia","National Anthem of Colombia"],
+  "Congo DR":["Debout Congolais","Arise, Congolese"],
+  "Côte d'Ivoire":["L'Abidjanaise","Song of Abidjan"],
+  "Croatia":["Lijepa naša domovino","Our Beautiful Homeland"],
+  "Curaçao":["Himno di Kòrsou","Anthem of Curaçao"],
+  "Czechia":["Kde domov můj","Where Is My Home"],
+  "Ecuador":["Salve, Oh Patria","Hail, Oh Fatherland"],
+  "Egypt":["بلادي، بلادي، بلادي / Bilady, Bilady, Bilady","My Country, My Country, My Country"],
+  "England":["God Save the King","God Save the King"],
+  "France":["La Marseillaise","The Song of Marseille"],
+  "Germany":["Das Lied der Deutschen","The Song of the Germans"],
+  "Ghana":["God Bless Our Homeland Ghana","God Bless Our Homeland Ghana"],
+  "Haiti":["La Dessalinienne","The Song of Dessalines"],
+  "IR Iran":["سرود ملی ایران / Soroud-e Melli-e Iran","National Anthem of Iran"],
+  "Iraq":["موطني / Mawtini","My Homeland"],
+  "Japan":["君が代 / Kimigayo","His Imperial Majesty's Reign"],
+  "Jordan":["السلام الملكي الأردني / As-salam al-malaki","The Royal Anthem of Jordan"],
+  "Korea Republic":["애국가 / Aegukga","The Patriotic Song"],
+  "Mexico":["Himno Nacional Mexicano","Mexican National Anthem"],
+  "Morocco":["النشيد الشريفي / Hymne Chérifien","Cherifian Anthem"],
+  "Netherlands":["Het Wilhelmus","The William"],
+  "New Zealand":["Aotearoa / God Defend New Zealand","God Defend New Zealand (Māori and English)"],
+  "Norway":["Ja, vi elsker dette landet","Yes, We Love This Country"],
+  "Panama":["Himno Istmeño","Hymn of the Isthmus"],
+  "Paraguay":["Himno Nacional del Paraguay","Paraguayan National Anthem"],
+  "Portugal":["A Portuguesa","The Portuguese"],
+  "Qatar":["السلام الأميري / As-Salam al-Amiri","The Royal Peace"],
+  "Saudi Arabia":["النشيد الوطني / Aash Al Maleek","Long Live the King"],
+  "Scotland":["Flower of Scotland","Flower of Scotland"],
+  "Senegal":["Pincez Tous vos Koras, Frappez les Balafons","Everyone Strum Your Koras, Strike the Balafons"],
+  "South Africa":["Nkosi Sikelel' iAfrika / Die Stem","God Bless Africa / The Call of South Africa"],
+  "Spain":["Marcha Real","The Royal March"],
+  "Sweden":["Du gamla, du fria","Thou Ancient, Thou Free"],
+  "Switzerland":["Schweizer Psalm / Cantique suisse","Swiss Psalm"],
+  "Tunisia":["حماة الحمى / Humat al-Hima","Defenders of the Homeland"],
+  "Türkiye":["İstiklal Marşı","Independence March"],
+  "Uruguay":["Himno Nacional de Uruguay","National Anthem of Uruguay"],
+  "USA":["The Star-Spangled Banner","The Star-Spangled Banner"],
+  "Uzbekistan":["O'zbekiston Respublikasining Davlat Madhiyasi","State Anthem of Uzbekistan"],
+};
+const TEAM_ANECDOTES = {
+  "Algeria": [
+    "In 1982, Algeria pulled off one of the greatest World Cup upsets ever by beating West Germany 2-1. Germany and Austria then played the infamous 'Disgrace of Gijón' — a mutually agreed 1-0 result that knocked Algeria out. FIFA changed the rules so final group matches are played simultaneously.",
+    "Riyad Mahrez once posted an Instagram story at 3am eating a kebab the night before a match. Algeria won. The kebab has never been formally cleared of performance-enhancing properties.",
+    "The Fennec Fox mascot is fitting — small, quick, thrives in harsh conditions, and has ears that can hear opportunity from miles away. Algeria qualified for 2026 by topping a brutal CAF group.",
+  ],
+  "Argentina": [
+    "Diego Maradona's 'Hand of God' in 1986 remains the most celebrated act of cheating in sports history. He later said it was scored 'a little with the head of Maradona and a little with the hand of God.'",
+    "Messi finally won the World Cup in 2022 at age 35, ending decades of 'Messi can't do it for Argentina' takes that fuelled approximately 40% of all football Twitter.",
+    "Argentina fans once smuggled flares into a stadium inside a prosthetic pregnant belly. Security was impressed by the commitment, if not the execution.",
+    "The 2022 final against France is widely considered the greatest World Cup final ever played. Mbappé scored a hat-trick and still lost. That's peak Argentina chaos.",
+  ],
+  "Australia": [
+    "In 2001, Australia beat American Samoa 31-0 in a World Cup qualifier. Archie Thompson scored 13 goals in one match. American Samoa's goalkeeper was 20 years old and had never played internationally before.",
+    "The Socceroos once qualified for the World Cup via a playoff against Uruguay that went to penalties. The entire nation held its breath. John Aloisi's celebration run is etched into Australian sporting folklore.",
+    "Tim Cahill's bicycle kick against the Netherlands in 2014 is statistically one of the greatest World Cup goals ever scored by a man who looks like he could also fix your plumbing.",
+  ],
+  "Austria": [
+    "Austria co-hosted Euro 2008 and went out in the group stage. Hosting privileges: used. Tournament impact: negligible.",
+    "The 'Wunderteam' of the 1930s was one of the greatest sides in football history, led by Matthias Sindelar, who reportedly refused to celebrate after the Anschluss. Austria's football heritage runs deeper than most people realise.",
+    "David Alaba won every possible trophy at Bayern Munich and Real Madrid. He has more Champions League medals than Austria have World Cup wins. Combined. Ever.",
+  ],
+  "Belgium": [
+    "Belgium's 'Golden Generation' — Hazard, De Bruyne, Lukaku, Courtois — was supposed to win everything. They finished third at the 2018 World Cup, which for Belgium counts as a dynasty.",
+    "Romelu Lukaku had three goals disallowed by VAR in a single match against Croatia at the 2022 World Cup. He punched the dugout glass. The glass, at least, did not appeal.",
+    "Belgium once went 589 days without a government (2010-2011). Their football team, by contrast, was extremely well organised. Make of that what you will.",
+  ],
+  "Bosnia & Herzegovina": [
+    "Bosnia qualified for their first-ever World Cup in 2014. The entire country essentially stopped functioning for the celebrations. Given the country's turbulent history, football unity was genuinely moving.",
+    "Edin Džeko is Bosnia's all-time top scorer and one of the most underrated strikers of his generation. He scored goals at Manchester City, Roma, and Inter that would make highlight reels — if anyone outside the Balkans was paying attention.",
+    "Their 2014 World Cup campaign ended in the group stage despite beating Iran 3-1. They were eliminated having scored more goals than several teams that advanced. Classic small-nation heartbreak.",
+  ],
+  "Brazil": [
+    "The 7-1 loss to Germany in the 2014 World Cup semi-final — at home, in front of their own fans — was so traumatic it got its own Wikipedia page titled 'Mineirazo.'",
+    "Brazil has won more World Cups (5) than any other nation, which they will remind you of roughly every 45 seconds.",
+    "Rivaldo once got a ball kicked at his shins, clutched his face, and got the opponent sent off. The acting was so bad it wouldn't pass a school play audition.",
+    "Neymar has spent a cumulative 14 minutes rolling on the ground at World Cup tournaments. Researchers have calculated this. We are not making this up.",
+  ],
+  "Cabo Verde": [
+    "Cabo Verde is a volcanic archipelago of 500,000 people in the Atlantic. Qualifying for the World Cup is roughly equivalent to Liechtenstein winning the Champions League in terms of statistical improbability.",
+    "Several of their squad were born in Portugal or the Netherlands and chose to represent the islands — a triumph of heritage football that makes FIFA eligibility lawyers earn their fees.",
+    "Their qualification campaign for 2026 was the feel-good story of African football. Tubarões Azuis (Blue Sharks) is an elite nickname for a team from an actual ocean archipelago.",
+  ],
+  "Canada": [
+    "Canada's only previous World Cup appearance was in 1986, where they lost all three games and didn't score a single goal. They waited 36 years to try again and qualified for 2022 with Alphonso Davies doing warp-speed runs down the left.",
+    "Alphonso Davies went from a Ghanaian refugee camp to Bayern Munich and the World Cup. His story is genuinely one of the most remarkable in modern football.",
+    "In the 2022 World Cup, Canada scored first against Croatia and briefly looked like pulling off a miracle. They lost 4-1. Baby steps.",
+  ],
+  "Colombia": [
+    "Andrés Escobar scored an own goal at the 1994 World Cup against the USA. He was murdered ten days later upon returning to Colombia. It remains one of football's darkest chapters.",
+    "Carlos Valderrama's hair was so iconic it has its own statue in Santa Marta. The hair was approximately 40% of Colombia's attacking threat in the 1990s.",
+    "James Rodríguez won the Golden Boot at the 2014 World Cup with a volley against Uruguay that is still used as a screensaver by roughly half of South America.",
+    "Colombian fans once threw a live chicken onto the pitch during a match. The chicken was unharmed and briefly considered for a place in midfield.",
+  ],
+  "Congo DR": [
+    "As Zaire in 1974, they became the first sub-Saharan African team at the World Cup. Defender Mwepu Ilunga infamously charged out of the wall and booted the ball away before a Yugoslav free kick was taken. For decades people thought he was clueless — he later revealed it was a deliberate protest because the team hadn't been paid.",
+    "The DR Congo's 2026 qualification is a triumph over decades of civil conflict and footballing neglect. Their 80-million-strong population has talent to burn — the diaspora includes players with roots at top European clubs.",
+    "Les Léopards won the Africa Cup of Nations in 1968 and 1974. They've been threatening to return to those heights ever since. The threat is becoming increasingly credible.",
+  ],
+  "Côte d'Ivoire": [
+    "Didier Drogba's emotional speech after Côte d'Ivoire qualified for the 2006 World Cup — 'Please lay down your weapons' — is credited with helping broker a ceasefire in the Ivorian Civil War. Football literally stopped a war.",
+    "They won the 2023 Africa Cup of Nations on home soil after sacking their manager mid-tournament and nearly going out in the group stage. The chaos-to-trophy pipeline was extraordinary.",
+    "The Touré brothers — Yaya and Kolo — were once at Manchester City together. Yaya once claimed the club forgot his birthday. A cake-gate scandal ensued. Football's pettiest controversy.",
+  ],
+  "Croatia": [
+    "Croatia reached the 2018 World Cup final with a population of 4 million. That's roughly the size of Los Angeles. They then finished third in 2022. Overachievement is their national sport.",
+    "Luka Modrić won the Ballon d'Or in 2018, breaking the Messi-Ronaldo duopoly. He was 33. He's still playing at the highest level in his late 30s, apparently immune to the concept of ageing.",
+    "The Croatian national shirt's red-and-white checkerboard pattern is either the most beautiful or most headache-inducing kit in world football. There is no middle ground.",
+  ],
+  "Curaçao": [
+    "Curaçao has a population of about 150,000 — roughly the size of a mid-tier English city — and they qualified for the World Cup. This is objectively insane.",
+    "Several of their squad have Dutch heritage and could have played for the Netherlands. They chose the island instead. Heart over head, every time.",
+    "Their 2026 qualification came through the CONCACAF pathway and stunned the footballing world. The tiny Caribbean island beat Guatemala on aggregate and nobody's recovery from that shock has been complete.",
+  ],
+  "Czechia": [
+    "As Czechoslovakia, they finished as World Cup runners-up in 1934 and 1962. As the Czech Republic, they reached the Euro 1996 final. As Czechia, they're rebranding and hoping the name change brings luck.",
+    "Pavel Nedvěd won the Ballon d'Or in 2003 with hair that belonged in a shampoo commercial. Juventus fans worshipped him. Defenders feared him. His locks were magnificent.",
+    "At Euro 2004, they beat the Netherlands 3-2 in one of the greatest group-stage matches ever played, only to lose to Greece — Greece! — in the semi-final. Peak Czechia.",
+  ],
+  "Ecuador": [
+    "Ecuador's first World Cup goal was scored by Agustín Delgado in 2002. The entire nation erupted. They then beat Croatia and advanced from the group — a genuine underdog story.",
+    "Enner Valencia has essentially been a one-man World Cup machine. He scored all three of Ecuador's goals at the 2014 World Cup and opened the scoring at the 2022 World Cup. The man lives for the tournament.",
+    "Their home ground in Quito sits at 2,850 metres altitude. Visiting teams arrive and spend the first 20 minutes wondering why they can't breathe. Ecuador considers this a feature, not a bug.",
+  ],
+  "Egypt": [
+    "Egypt went 28 years without playing at a World Cup (1990-2018). When they finally qualified for Russia 2018, the celebrations were so intense that a commentator literally died of a heart attack on air. (This actually happened. Ahmed Said collapsed after Salah's penalty.)",
+    "Mohamed Salah is Egypt's greatest-ever player and Liverpool's modern icon. He once scored a goal, prayed in celebration, and accidentally started a meme that united the entire internet.",
+    "Egypt has won the Africa Cup of Nations a record seven times — more than any other nation. Their World Cup record, by contrast, is less decorated. One win in eight matches across all tournaments.",
+  ],
+  "England": [
+    "England invented football, then spent the next 150+ years reminding everyone about it while failing to win another World Cup after 1966.",
+    "The 'Three Lions' have perfected the art of penalty shootout heartbreak. They've lost 7 out of 10 shootouts at major tournaments. It's practically a national tradition.",
+    "Wayne Rooney once got sent off for stomping on Ricardo Carvalho at the 2006 World Cup. His teammate Cristiano Ronaldo winked at the bench. Relations were frosty for approximately three years.",
+    "Gareth Southgate missed a penalty in the Euro 96 semi-final, then spent 25 years managing the team and redeeming himself. English football is essentially a long-form therapy session.",
+  ],
+  "France": [
+    "France won the 1998 World Cup at home and the entire country partied on the Champs-Élysées. Zidane headed two goals in the final. He was briefly more popular than wine.",
+    "At the 2006 World Cup final, Zidane headbutted Marco Materazzi in his last ever match. He won the Golden Ball anyway. Peak French drama.",
+    "France's squad is so stacked with talent that players who'd start for most nations can't get a call-up. Karim Benzema won the Ballon d'Or while essentially exiled from the national team.",
+    "Mbappé scored a hat-trick in the 2022 World Cup final and still lost. He then signed the largest contract in football history. Consolation prizes vary.",
+  ],
+  "Germany": [
+    "Germany have reached the semi-finals of 13 World Cups. Their consistency is less 'football team' and more 'engineering project with scheduled maintenance windows.'",
+    "The 7-1 demolition of Brazil in 2014 was so brutal that German players reportedly felt uncomfortable celebrating after the fifth goal. The scoreline has its own cultural legacy.",
+    "Germany were knocked out in the group stage in both 2018 and 2022. The Weltmeister humbled. Pundits declared the dynasty dead. They'll probably reach the semi-finals again out of sheer habit.",
+    "Miroslav Klose is the all-time World Cup top scorer with 16 goals. He celebrated every one with a front flip. The man was part striker, part gymnast.",
+  ],
+  "Ghana": [
+    "In 2010, Luis Suárez handballed on the line to deny Ghana a World Cup semi-final place. Asamoah Gyan missed the resulting penalty. An entire continent wept. Suárez smiled. Football is cruel.",
+    "Ghana became the third African team to reach the World Cup quarter-finals in 2010. Their Black Stars squad was genuinely excellent. Then the Suárez incident happened.",
+    "At the 2014 World Cup, a plane flew over the Ghana camp and dropped $3 million in cash to pay the players' appearance fees after a payment dispute. This is not a joke. An actual plane. Actual cash.",
+  ],
+  "Haiti": [
+    "Haiti qualified for the 1974 World Cup — their only previous appearance — and centre-back Ernst Jean-Joseph tested positive for a banned substance. It was later attributed to medication for asthma.",
+    "Emmanuel Sanon scored against Italy at the 1974 World Cup, ending Dino Zoff's record of 1,142 minutes without conceding a goal. One moment of pure Haitian glory against the azzurri.",
+    "Haiti's 2026 qualification is a genuine sporting miracle given the country's devastating earthquakes, political turmoil, and chronic underfunding of football infrastructure. Les Grenadiers earned every inch of their place.",
+  ],
+  "IR Iran": [
+    "Iran beat the USA 2-1 at the 1998 World Cup in one of the most politically charged matches in football history. Players exchanged flowers before kick-off. Then they got stuck in.",
+    "At the 2022 World Cup, Iranian players refused to sing their national anthem in solidarity with the Mahsa Amini protests. It was one of the most powerful political statements in World Cup history.",
+    "Ali Daei held the all-time international goalscoring record (109 goals) for 15 years until Cristiano Ronaldo surpassed him. Iran's greatest striker doesn't get the global recognition he deserves.",
+  ],
+  "Iraq": [
+    "Iraq won the 2007 Asian Cup while the country was in the midst of war. Players reportedly trained under the sound of explosions. The victory united a fractured nation, however briefly.",
+    "The Lions of Mesopotamia's football history is inseparable from the country's turbulent politics. Under Uday Hussein, players were allegedly tortured for poor performances. The sport's liberation since has been genuine.",
+    "Iraq's qualification for the 2026 World Cup is their first since 1986. Forty years of waiting through wars, sanctions, and rebuilding. This is more than football.",
+  ],
+  "Japan": [
+    "Japan beat Germany and Spain in the group stage at the 2022 World Cup, then lost to Croatia on penalties in the Round of 16. The pattern of heroic group stages followed by knockout heartbreak is becoming tradition.",
+    "Japanese fans clean the stadium after every match. Every. Single. Match. They bring their own bin bags. The rest of the world looks on in shame and admiration.",
+    "Captain Tsubasa (a football manga) is credited with inspiring an entire generation of Japanese players. A cartoon character is essentially responsible for Japan's football development. This worked.",
+  ],
+  "Jordan": [
+    "Jordan reached the 2023 Asian Cup final — their first major final ever — losing to Qatar. For a country not traditionally associated with football, it was a seismic moment.",
+    "Al-Nashama means 'the brave ones' in Arabic, and their 2026 World Cup qualification is their first ever. A country of 11 million people that lives and breathes for this.",
+    "Jordanian football has grown exponentially since the royal family invested in grassroots development. Queen Rania is a genuine football fan. Royal patronage helps.",
+  ],
+  "Korea Republic": [
+    "South Korea reached the 2002 World Cup semi-finals as co-hosts, beating Spain and Italy along the way. The refereeing in those matches remains... controversial, shall we say. Very controversial.",
+    "Son Heung-min is one of the most lethal forwards in world football and was exempted from military service after winning the 2018 Asian Games gold medal. The stakes were literally 'score goals or serve in the army.'",
+    "Korean fans created the 'Red Devils' supporter movement that turned the 2002 World Cup into the most atmospheric tournament in memory. Streets were packed with millions of fans in matching red shirts.",
+  ],
+  "Mexico": [
+    "Mexico have been eliminated in the Round of 16 at seven consecutive World Cups (1994-2018). This is known as the 'Quinto Partido' curse — the fifth match they can never win.",
+    "Hugo Sánchez's bicycle kicks in the 1980s and 90s made him one of the most spectacular strikers ever. He celebrated each goal with an Olympic-style somersault. Liga perfection.",
+    "At the 2018 World Cup, Mexico beat Germany 1-0 and the celebrations in Mexico City literally triggered earthquake sensors. Seismologists confirmed it. Football-induced seismic activity.",
+    "The Mexican wave was NOT invented in Mexico. It was popularised at the 1986 World Cup in Mexico, but originated at American college football games. Don't tell Mexican fans this.",
+  ],
+  "Morocco": [
+    "Morocco became the first African and Arab nation to reach a World Cup semi-final in 2022. They beat Belgium, Spain, and Portugal along the way. Players celebrated with their mothers on the pitch.",
+    "Achraf Hakimi scored the winning penalty against Spain with a Panenka — a cheeky dink down the middle. His mother was in the stands. Cold-blooded with familial warmth.",
+    "Morocco's 2022 campaign united the entire Arab world and African continent behind one team. Even neutral fans found themselves unable to resist the underdog story.",
+  ],
+  "Netherlands": [
+    "The Netherlands invented 'Total Football' in the 1970s with Johan Cruyff, revolutionised the sport, and then lost the 1974 World Cup final. They also lost the 1978 final. And the 2010 final. Three finals, zero trophies. Magnificent underachievement.",
+    "The Dutch have a word — 'Oranjegekte' (Orange madness) — for the national hysteria that grips the country during major tournaments. Entire streets turn orange. Canals turn orange. Everything is orange.",
+    "Dennis Bergkamp's goal against Argentina in 1998 involved a 60-yard pass, one touch to control, and a finish into the far corner. He was reportedly afraid of flying. He was not afraid of anything else.",
+  ],
+  "New Zealand": [
+    "New Zealand went unbeaten at the 2010 World Cup, drawing all three group games including against defending champions Italy. They still went out. But technically: unbeaten.",
+    "The All Whites' name is a reference to their kit colour and absolutely not a reference to the much more famous All Blacks rugby team. It is very much overshadowed by the rugby team.",
+    "New Zealand's 2026 qualification involved an intercontinental playoff. For a country of 5 million where rugby is king, making a World Cup is like finding a unicorn in your garden shed.",
+  ],
+  "Norway": [
+    "Norway have beaten Brazil in every match they've ever played against them (4 matches, 4 wins). This is a real statistic. Brazil has five World Cups. Norway has four wins against Brazil. Football is beautifully illogical.",
+    "Erling Haaland scores goals at a rate that makes video games look realistic. His father Alfie played for Norway and Manchester City. The goalscoring gene is apparently hereditary.",
+    "Norway once refused to play in a World Cup qualifier against Israel in the 1970s on political grounds. Their football federation has never been afraid to take a stance.",
+  ],
+  "Panama": [
+    "Panama qualified for their first ever World Cup in 2018 and the country declared a national holiday. Schools and businesses closed. The president gave a national address. For a football qualifier.",
+    "At the 2018 World Cup, Panama scored their first-ever World Cup goal against England. The stadium erupted. The commentator wept. They lost 6-1 but that one goal meant everything.",
+    "Román Torres scored the qualifying goal that sent Panama to the 2018 World Cup. He was mobbed so enthusiastically he could barely breathe. The nation literally overwhelmed their hero.",
+  ],
+  "Paraguay": [
+    "Paraguay reached the World Cup quarter-finals in 2010 despite playing some of the most defensively pragmatic football ever witnessed. Goalkeeper Justo Villar was their best player. That tells you everything.",
+    "José Luis Chilavert was a goalkeeper who took free kicks and penalties. He scored 62 career goals, including a hat-trick. FROM GOAL. He also once punched Roberto Carlos.",
+    "Paraguay's qualification campaigns are always dramatic. They occupy the awkward middle ground of South American football — too good for easy groups, too inconsistent for favouritism.",
+  ],
+  "Portugal": [
+    "Cristiano Ronaldo has scored more international goals than anyone in history. He has celebrated each one as if he personally invented the concept of football.",
+    "Éder, a striker who spent most of his career in mid-table obscurity, scored the winning goal in the Euro 2016 final after Ronaldo went off injured. The ultimate 'unlikely hero' moment.",
+    "Portugal won Euro 2016 despite drawing all three group games. They won the entire tournament without winning a single match in 90 minutes until the semi-final. Anti-football? No — peak Portuguese efficiency.",
+    "Ronaldo's 'SIUUUU' celebration has been replicated by approximately every child on every playground on every continent. It is the most imitated celebration in human history.",
+  ],
+  "Qatar": [
+    "Qatar hosted the 2022 World Cup and went out in the group stage as the worst-performing host nation in tournament history, losing all three games and scoring one goal.",
+    "They won the 2019 Asian Cup — their first major trophy — beating Japan 3-1 in the final. Almoez Ali scored a bicycle kick that was genuinely world-class.",
+    "Qatar's football infrastructure was built essentially from scratch in 15 years. Eight brand-new stadiums, air-conditioned, in the desert. Say what you will about the controversy — the engineering was remarkable.",
+  ],
+  "Saudi Arabia": [
+    "Saudi Arabia beat Argentina 2-1 in the opening match of the 2022 World Cup. Messi scored from the penalty spot. Then Saudi scored twice in five minutes. The King declared a national holiday.",
+    "Salem Al-Dawsari's winning goal against Argentina involved a touch, a turn, and a curling shot that had no right going in. It was immediately nominated for goal of the tournament.",
+    "The Saudi Pro League signed Ronaldo, Neymar, Benzema, and half of Europe's ageing elite. The league went from obscurity to tabloid front pages overnight. Football's ultimate plot twist.",
+  ],
+  "Scotland": [
+    "Scotland have qualified for eight World Cups and have never progressed beyond the group stage. Not once. In eight attempts. Consistency of a very specific kind.",
+    "In 1978, Scotland manager Ally MacLeod declared they would win the World Cup. They were eliminated in the group stage after losing to Peru and drawing with Iran. Managing expectations is not a Scottish strength.",
+    "The Tartan Army are widely considered the best-behaved fans in world football. They travel in enormous numbers, drink enthusiastically, and clean up after themselves. They're basically the anti-hooligans.",
+  ],
+  "Senegal": [
+    "Senegal beat France 1-0 in the opening match of the 2002 World Cup — the holders, in the first game of the tournament. Papa Bouba Diop scored and the team celebrated by dancing around a corner flag. Iconic.",
+    "Sadio Mané won the Africa Cup of Nations for Senegal in 2022 with the decisive penalty in the final. He'd missed a penalty earlier in the match. Redemption arcs don't come neater.",
+    "Senegal reached the 2002 World Cup quarter-finals on their debut. They beat Sweden in the Round of 16 with a golden goal by Henri Camara. The Lions of Teranga arrived at the top table and ate well.",
+  ],
+  "South Africa": [
+    "South Africa hosted the 2010 World Cup — the first on African soil — and the vuvuzela became the most divisive instrument since the bagpipes. You either loved the drone or wished for silence. There was no middle ground.",
+    "Bafana Bafana are the only host nation besides Qatar to be eliminated in the group stage. They drew with Mexico and beat France, but goal difference sent them home. Heartbreak with a vuvuzela soundtrack.",
+    "Siphiwe Tshabalala's opening goal of the 2010 World Cup — a thunderbolt against Mexico — remains one of the greatest World Cup opening goals. The whole of Africa celebrated.",
+  ],
+  "Spain": [
+    "Spain won the 2010 World Cup with the most possession-obsessed, pass-happy football ever seen. They completed roughly 47,000 passes per game. Opposing teams needed therapy afterwards.",
+    "Between 2008 and 2012, Spain won Euro 2008, the 2010 World Cup, and Euro 2012. Tiki-taka was so dominant that other nations simply gave up trying to get the ball and waited for Spain to get bored.",
+    "Luis Enrique's young Spanish squad won the 2024 Nations League. The average age was about 24. La Roja's rebuilding project appears to have worked spectacularly well.",
+    "Sergio Ramos once missed a Panenka penalty so badly it nearly achieved orbit. He also scored crucial goals in two Champions League finals. Ramos is chaos personified.",
+  ],
+  "Sweden": [
+    "Sweden finished third at the 2018 World Cup... wait, no, that was the quarter-finals. They beat Mexico 3-0 in the group, which was very un-Swedish in its ruthlessness.",
+    "Zlatan Ibrahimović scored a 30-yard bicycle kick against England in 2012 that is widely considered one of the greatest goals ever scored. He retired from internationals and then un-retired. Twice.",
+    "Sweden knocked out Italy from 2018 World Cup qualification. Italy. The four-time World Cup winners. Swedish pragmatism versus Italian drama. Pragmatism won.",
+  ],
+  "Switzerland": [
+    "Switzerland haven't lost a World Cup group-stage match since 2014. They're the world champions of not losing in the groups. After that, however, all bets are off.",
+    "Xherdan Shaqiri scored a bicycle kick against Poland at Euro 2016 while being roughly the same height as the corner flag. The man is a cube of pure footballing talent.",
+    "Granit Xhaka and Shaqiri celebrated goals against Serbia at the 2018 World Cup with the Albanian eagle hand gesture. Given that several Swiss players have Kosovar-Albanian heritage, the geopolitical layers were thicker than Swiss chocolate.",
+  ],
+  "Tunisia": [
+    "Tunisia beat France at the 2022 World Cup but were eliminated on goal difference anyway. The 'we beat the world champions and still went home' energy was peak Tunisian footballing tragedy.",
+    "The Eagles of Carthage were the first African team to win a World Cup match, beating Mexico 3-1 in 1978. Historical priority: secured.",
+    "Tunisia have qualified for six World Cups and have advanced from the group stage precisely zero times. They are the world's most experienced group-stage specialists.",
+  ],
+  "Türkiye": [
+    "Türkiye finished third at the 2002 World Cup, beating South Korea in the third-place match. Hakan Şükür scored after 11 seconds — the fastest goal in World Cup history. He was later exiled from Turkish football for political reasons.",
+    "Turkish football is famous for its intense atmosphere. Galatasaray's 'Welcome to Hell' banner at the airport has greeted visiting teams since the 1990s. The atmosphere at Turkish matches is approximately 140 decibels.",
+    "İlkay Gündoğan, Mesut Özil, and Emre Can all have Turkish heritage but played for Germany. The talent pipeline between Turkey and the German national team is Ankara's biggest export regret.",
+  ],
+  "Uruguay": [
+    "Uruguay won the first ever World Cup in 1930 and then won it again in 1950 by beating Brazil in the 'Maracanazo' — the most devastating result in Brazilian football history.",
+    "Luis Suárez bit Giorgio Chiellini at the 2014 World Cup. It was his third biting incident. FIFA banned him. He has more World Cup bites than most teams have World Cup goals.",
+    "Uruguay has a population of 3.5 million — smaller than most major cities — yet has won two World Cups, two Olympic golds, and 15 Copa Américas. Pound for pound, the greatest football nation in history.",
+  ],
+  "USA": [
+    "The 1950 US team beat England 1-0 at the World Cup with a squad that included a Haitian-born dishwasher, a mailman, and a hearse driver. English newspapers assumed the score was a typo.",
+    "The USMNT failed to qualify for the 2018 World Cup after losing to Trinidad & Tobago — a team ranked 99th in the world. The subsequent soccer soul-searching lasted approximately four years.",
+    "As co-hosts of the 2026 World Cup, the USA is investing billions in the tournament. If they go out in the group stage on home soil, the memes will be visible from space.",
+    "Christian Pulisic is known as 'Captain America' and carries the hopes of 330 million people, most of whom only watch football every four years. No pressure.",
+  ],
+  "Uzbekistan": [
+    "Uzbekistan qualified for the World Cup for the first time in their history for 2026. The White Wolves had been agonisingly close multiple times — losing Asian playoff spots by narrow margins.",
+    "Server Djeparov was twice named Asian Footballer of the Year (2008, 2011) but never got to play in a World Cup. This generation finally finished what their predecessors started.",
+    "Uzbek football is built on a post-Soviet system that produces technically excellent players. The Pakhtakor Tashkent plane crash of 1979, which killed the entire team, remains the most tragic event in Central Asian football history.",
+  ],
+};
+const FIFA_SLUGS={
+  "Algeria":"algeria","Argentina":"argentina","Australia":"australia","Austria":"austria",
+  "Belgium":"belgium","Bosnia & Herzegovina":"bosnia-and-herzegovina","Brazil":"brazil",
+  "Cabo Verde":"cabo-verde","Canada":"canada","Colombia":"colombia","Congo DR":"congo-dr",
+  "Côte d'Ivoire":"cote-d-ivoire","Croatia":"croatia","Curaçao":"curacao","Czechia":"czechia",
+  "Ecuador":"ecuador","Egypt":"egypt","England":"england","France":"france","Germany":"germany",
+  "Ghana":"ghana","Haiti":"haiti","IR Iran":"ir-iran","Iraq":"iraq","Japan":"japan",
+  "Jordan":"jordan","Korea Republic":"korea-republic","Mexico":"mexico","Morocco":"morocco",
+  "Netherlands":"netherlands","New Zealand":"new-zealand","Norway":"norway","Panama":"panama",
+  "Paraguay":"paraguay","Portugal":"portugal","Qatar":"qatar","Saudi Arabia":"saudi-arabia",
+  "Scotland":"scotland","Senegal":"senegal","South Africa":"south-africa","Spain":"spain",
+  "Sweden":"sweden","Switzerland":"switzerland","Tunisia":"tunisia","Türkiye":"turkiye",
+  "Uruguay":"uruguay","USA":"usa","Uzbekistan":"uzbekistan"
+};
+const FIPS_CODES={
+  dz:"ag",ar:"ar",au:"as",at:"au",be:"be",ba:"bk",br:"br",cv:"cv",ca:"ca",co:"co",
+  cd:"cg",ci:"iv",hr:"hr",cw:"uc",cz:"ez",ec:"ec",eg:"eg",gb:"uk",fr:"fr",de:"gm",
+  gh:"gh",ht:"ha",ir:"ir",iq:"iz",jp:"ja",jo:"jo",kr:"ks",mx:"mx",ma:"mo",nl:"nl",
+  nz:"nz",no:"no",pa:"pm",py:"pa",pt:"po",qa:"qa",sa:"sa",sn:"sg",za:"sf",es:"sp",
+  se:"sw",ch:"sz",tn:"ts",tr:"tu",uy:"uy",us:"us",uz:"uz"
 };
 const D=[
 [1,"G","A","2026-06-11","20:00","Mexico","South Africa"],[2,"G","A","2026-06-12","3:00","Korea Republic","Czechia"],
@@ -728,6 +1426,8 @@ async function fetchScores(){
   }
 }
 
+function isRealTeam(name){return!/^(Winner|Runner-up|Loser|3rd place)/.test(name)}
+function teamLink(name){return isRealTeam(name)?'<a href="#" class="team-link" data-team="'+name+'">'+name+'</a>':name;}
 function render(){
   let rows=D.filter(r=>{
     if(state.stage&&r[1]!==state.stage)return false;
@@ -784,8 +1484,10 @@ function render(){
       const hLoser=sc?.finished&&hNum<aNum,aLoser=sc?.finished&&aNum<hNum;
       const hScorers=sc?.homeScorers?.length?'<span class="scorers">'+sc.homeScorers.join(' · ')+'</span>':'';
       const aScorers=sc?.awayScorers?.length?'<span class="scorers">'+sc.awayScorers.join(' · ')+'</span>':'';
-      const homeHtml='<div class="m-home"><b class="'+(hLoser?"loser":"")+'">'+homeName+'</b>'+hScorers+'</div>';
-      const awayHtml='<div class="m-away"><b class="'+(aLoser?"loser":"")+'">'+awayName+'</b>'+aScorers+'</div>';
+      const homeLink=isRealTeam(homeName)?'<a href="#" class="team-link" data-team="'+homeName+'">'+homeName+'</a>':homeName;
+      const awayLink=isRealTeam(awayName)?'<a href="#" class="team-link" data-team="'+awayName+'">'+awayName+'</a>':awayName;
+      const homeHtml='<div class="m-home"><b class="'+(hLoser?"loser":"")+'">'+homeLink+'</b>'+hScorers+'</div>';
+      const awayHtml='<div class="m-away"><b class="'+(aLoser?"loser":"")+'">'+awayLink+'</b>'+aScorers+'</div>';
 
       const venueHtml=VENUES[r[0]]?'<div class="m-venue">'+VENUES[r[0]]+'</div>':'';
       m.innerHTML=timeHtml+homeHtml+scoreHtml+awayHtml+'<div class="meta">'+tagFor(r)+'<span class="num">#'+String(r[0]).padStart(3,"0")+'</span></div>'+venueHtml;
@@ -796,6 +1498,8 @@ function render(){
 }
 
 /* dynamic banner — next match countdown / live indicator */
+let _bannerMatchId=null,_bannerFactsHtml="";
+function pickFact(team){const a=TEAM_ANECDOTES?.[team];return a?.length?a[Math.floor(Math.random()*a.length)]:"";}
 function updateBanner(){
   const now=Date.now();
   const MATCH_WINDOW=115*60*1000;
@@ -837,9 +1541,9 @@ function updateBanner(){
         +'<span class="lm-meta">'+stageLabel+' · Match '+r[0]+'</span>'
         +'<span class="lm-half">'+halfStr+'</span></div>'
         +'<div class="lm-score-row">'
-        +'<div class="lm-team lm-home"><span class="lm-name">'+h+'</span>'+hScorers+'</div>'
+        +'<div class="lm-team lm-home"><span class="lm-name">'+teamLink(h)+'</span>'+hScorers+'</div>'
         +'<div class="lm-goals">'+(sc?.home??"0")+'&nbsp;–&nbsp;'+(sc?.away??"0")+'</div>'
-        +'<div class="lm-team lm-away"><span class="lm-name">'+a+'</span>'+aScorers+'</div>'
+        +'<div class="lm-team lm-away"><span class="lm-name">'+teamLink(a)+'</span>'+aScorers+'</div>'
         +'</div>'
         +(venue?'<div class="lm-venue">'+venue+'</div>':'')
         +'</div>';
@@ -865,7 +1569,9 @@ function updateBanner(){
   const na=teamOverrides.get(next[0])?.away??next[6];
   el.innerHTML='<span class="k-label">Next kick-off in</span>'
     +'<span class="k-time">'+tStr+'</span>'
-    +'<span class="k-match">Match '+next[0]+' · '+nh+' v '+na+' · '+fmtDateShort(next.epoch)+', '+fmtTime(next.epoch)+'</span>';
+    +'<span class="k-match">Match '+next[0]+' · '+teamLink(nh)+' v '+teamLink(na)+' · '+fmtDateShort(next.epoch)+', '+fmtTime(next.epoch)+'</span>';
+  if(_bannerMatchId!==next[0]){_bannerMatchId=next[0];_bannerFactsHtml='<span class="k-facts"><b>'+nh+':</b> '+pickFact(nh)+'<br><b>'+na+':</b> '+pickFact(na)+'</span>';}
+  el.innerHTML+=_bannerFactsHtml;
 }
 updateBanner();setInterval(updateBanner,1000);
 
@@ -920,7 +1626,7 @@ function standingsTableRows(teams,qualify){
     return'<tr'+q+'>'
       +'<td class="pos">'+(i+1)+'</td>'
       +'<td class="flag">'+flagImg+'</td>'
-      +'<td class="tn">'+t.name+'</td>'
+      +'<td class="tn"><a href="#" class="team-link" data-team="'+t.name+'">'+t.name+'</a></td>'
       +'<td class="num">'+t.mp+'</td>'
       +'<td class="num">'+t.w+'</td>'
       +'<td class="num">'+t.d+'</td>'
@@ -947,7 +1653,7 @@ function renderGroups(){
         +'<th title="Lost">L</th><th title="Goal difference">GD</th><th title="Points">Pts</th>'
         +'</tr></thead><tbody>'+standingsTableRows(standing,2)+'</tbody></table>';
     }else{
-      const names=[...localTeams[g]].map(t=>'<li>'+t+'</li>').join("");
+      const names=[...localTeams[g]].map(t=>'<li><a href="#" class="team-link" data-team="'+t+'">'+t+'</a></li>').join("");
       body='<ul>'+names+'</ul>';
     }
     card.innerHTML='<div class="gc-head" style="background:'+GROUP_COLORS[g]+'"><span class="g">Group '+g+'</span><span class="m">6 matches</span></div>'+body;
@@ -978,7 +1684,7 @@ function renderStrip(){
       const q=i<2?' class="q"':"";
       const flagImg=t.flag?'<img src="'+t.flag+'" alt="">':"";
       return'<tr'+q+'>'
-        +'<td class="left"><span style="color:var(--chalk-faint);font-family:var(--font-mono);font-size:11px">'+(i+1)+'</span>'+flagImg+t.name+'</td>'
+        +'<td class="left"><span style="color:var(--chalk-faint);font-family:var(--font-mono);font-size:11px">'+(i+1)+'</span>'+flagImg+'<a href="#" class="team-link" data-team="'+t.name+'">'+t.name+'</a></td>'
         +'<td>'+t.mp+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td>'
         +'<td>'+(t.gd>0?"+":"")+t.gd+'</td>'
         +'<td class="pts">'+t.pts+'</td>'
@@ -1068,5 +1774,645 @@ window.addEventListener("pageshow",e=>{
   fetchStandings().then(()=>fetchScores());
 });
 </script>
+
+<dialog id="teamDialog" aria-labelledby="td-title">
+  <div class="td-header">
+    <h2 id="td-title" class="td-team-name" tabindex="-1">Team</h2>
+    <img id="td-flag" class="td-flag" src="" alt="" width="48" height="32">
+    <button class="td-close" id="td-dialog-close" aria-label="Close team profile">&#x2715;</button>
+  </div>
+  <div class="td-body" id="td-body">
+    <div class="td-loading">Loading team profile…</div>
+  </div>
+  <div class="td-footer">
+    <a id="td-fifa-link" class="td-fifa-btn" href="#" target="_blank" rel="noopener">View on FIFA.com ↗</a>
+  </div>
+</dialog>
+
+<script>
+/* ---- team profile dialog ---- */
+const teamDialog=document.getElementById('teamDialog');
+const teamDataCache=new Map();
+
+function showTeamDialog(teamName){
+  const dlg=teamDialog;
+  document.getElementById('td-title').textContent=teamName;
+  document.getElementById('td-flag').src='';
+  document.getElementById('td-flag').alt='';
+  document.getElementById('td-body').innerHTML='<div style="text-align:center;padding:40px 0"><div class="td-spinner"></div><div class="td-loading" style="margin-top:8px">Loading team profile…</div></div>';
+  document.getElementById('td-fifa-link').href='#';
+  document.body.style.overflow='hidden';
+  dlg.showModal();
+  if(typeof TEAM_META!=='undefined'&&TEAM_META[teamName]){
+    const meta=TEAM_META[teamName];
+    document.getElementById('td-fifa-link').href=
+      'https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/teams/'+meta.slug;
+    document.getElementById('td-flag').src='https://flagcdn.com/'+meta.flagcdn+'.svg';
+    document.getElementById('td-flag').alt=teamName+' flag';
+  }
+  if(typeof loadTeamData==='function'){
+    loadTeamData(teamName).then(data=>{
+      renderTeamProfile(data,teamName);
+    }).catch(e=>{
+      console.warn('Team data load failed:',e);
+      document.getElementById('td-body').innerHTML=
+        '<div class="td-loading">Team profile unavailable — check your connection.</div>';
+    });
+  }
+}
+
+document.getElementById('td-dialog-close').addEventListener('click',()=>teamDialog.close());
+teamDialog.addEventListener('click',e=>{
+  const r=teamDialog.getBoundingClientRect();
+  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)
+    teamDialog.close();
+});
+teamDialog.addEventListener('close',()=>{document.body.style.overflow='';});
+
+function getPlayerPhotoSrc(slug, player) {
+  const photo = player.photo;
+  if (!photo) {
+    const pos = (player.position || 'MF').toLowerCase();
+    return 'assets/silhouettes/' + pos + '.svg';
+  }
+  if (photo.startsWith('assets/') || photo.startsWith('http')) return photo;
+  return 'assets/teams/' + slug + '/' + photo;
+}
+
+var _pitchPlayers = [];
+
+function renderPitch(teamData, container) {
+  const result = inferFormation(teamData?.roster?.players || teamData?.roster || []);
+  if (!result) {
+    container.innerHTML = '<p class="td-loading">No roster data available.</p>';
+    return;
+  }
+  const {formation, positions, subs} = result;
+  const slug = teamData.slug;
+  _pitchPlayers = [];
+
+  function displayName(player) {
+    var parts = (player.name || '').split(' ');
+    var last = player.last_name || parts.pop();
+    var firstInit = parts.length ? parts[0][0] + '.' : '';
+    return last + (firstInit ? ', ' + firstInit : '');
+  }
+
+  let html = '<div class="pitch">' +
+    '<div class="pitch-top-box"></div>' +
+    '<div class="pitch-bot-box"></div>' +
+    '<div class="pitch-top-six"></div>' +
+    '<div class="pitch-bot-six"></div>' +
+    '<div class="pitch-spot"></div>' +
+    '<div class="pitch-formation">' + formation + '</div>';
+
+  positions.forEach(function(item) {
+    var player = item.player, x = item.x, y = item.y;
+    var pos = (player.position || 'mf').toLowerCase();
+    var isCaptain = player.captain;
+    var photoSrc = getPlayerPhotoSrc(slug, player);
+    var dName = displayName(player);
+    var age = player.age || (player.dob ? (2026 - parseInt(player.dob)) : '?');
+    var pidx = _pitchPlayers.length;
+    _pitchPlayers.push(player);
+
+    var statsHtml = '<div class="pc-stats">' +
+      '<div class="ps-row"><span class="ps-label">#</span>' + player.number + ' ' + player.position + '</div>' +
+      '<div class="ps-row"><span class="ps-label">Caps</span>' + player.caps + '</div>' +
+      '<div class="ps-row"><span class="ps-label">Goals</span>' + player.goals + '</div>' +
+      '<div class="ps-row"><span class="ps-label">Club</span>' + (player.club || '\u2014') + '</div>' +
+      '<div class="ps-row"><span class="ps-label">Age</span>' + age + '</div>' +
+      '</div>';
+
+    html += '<div class="player-card' + (isCaptain ? ' captain' : '') +
+      (photoSrc.includes('silhouettes') ? ' no-photo ' + pos : '') + '"' +
+      ' style="left:' + x + '%;top:' + y + '%"' +
+      ' data-pidx="' + pidx + '"' +
+      ' tabindex="0" aria-label="' + player.name + ', #' + player.number + '">' +
+      '<div class="pc-avatar">' +
+      '<img src="' + photoSrc + '" alt="' + player.name + '"' +
+      " onerror=\"this.onerror=null;this.src='assets/silhouettes/" + pos + ".svg';this.closest('.player-card').classList.add('no-photo','" + pos + "')\">" +
+      '<span class="pc-num">' + player.number + '</span>' +
+      '</div>' +
+      '<span class="pc-name">' + dName + '</span>' +
+      statsHtml +
+      '</div>';
+  });
+
+  html += '</div>';
+
+  if (subs && subs.length) {
+    html += '<div class="subs-strip"><div class="subs-label">Substitutes</div>';
+    subs.slice(0, 15).forEach(function(player) {
+      var pos = (player.position || 'mf').toLowerCase();
+      var photoSrc = getPlayerPhotoSrc(slug, player);
+      var dName = displayName(player);
+      var pidx = _pitchPlayers.length;
+      _pitchPlayers.push(player);
+      html += '<div class="sub-card" data-pidx="' + pidx + '" title="' + player.name + ' (#' + player.number + ') \u2014 ' + player.club + '">' +
+        '<div class="pc-avatar">' +
+        '<img src="' + photoSrc + '" alt="' + player.name + '"' +
+        " onerror=\"this.onerror=null;this.src='assets/silhouettes/" + pos + ".svg'\">" +
+        '</div>' +
+        '<span class="pc-name">' + dName + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div id="td-player-detail" class="player-detail" hidden></div>';
+  container.innerHTML = html;
+
+  container.querySelector('.pitch')?.addEventListener('click', function(e) {
+    var card = e.target.closest('.player-card');
+    if (card) {
+      var idx = parseInt(card.dataset.pidx);
+      if (!isNaN(idx) && _pitchPlayers[idx]) showPlayerDetail(_pitchPlayers[idx], slug);
+    }
+  });
+  container.querySelector('.subs-strip')?.addEventListener('click', function(e) {
+    var card = e.target.closest('.sub-card');
+    if (card) {
+      var idx = parseInt(card.dataset.pidx);
+      if (!isNaN(idx) && _pitchPlayers[idx]) showPlayerDetail(_pitchPlayers[idx], slug);
+    }
+  });
+}
+
+function showPlayerDetail(player, slug) {
+  var det = document.getElementById('td-player-detail');
+  if (!det) return;
+
+  var social = player.social || {};
+  var socialLinks = [
+    social.instagram ? '<a href="https://' + social.instagram + '" target="_blank" rel="noopener" class="ps-social">\ud83d\udcf7 Instagram</a>' : '',
+    social.twitter ? '<a href="https://' + social.twitter + '" target="_blank" rel="noopener" class="ps-social">\ud835\udd4f Twitter</a>' : '',
+    social.facebook ? '<a href="https://' + social.facebook + '" target="_blank" rel="noopener" class="ps-social">\ud83d\udcd8 Facebook</a>' : '',
+    social.youtube ? '<a href="https://' + social.youtube + '" target="_blank" rel="noopener" class="ps-social">\u25b6 YouTube</a>' : '',
+    social.website ? '<a href="https://' + social.website + '" target="_blank" rel="noopener" class="ps-social">\ud83c\udf10 Website</a>' : '',
+  ].filter(Boolean).join(' ');
+
+  var photoSrc = getPlayerPhotoSrc(slug, player);
+  var fullName = player.full_name || player.name;
+  var lastName = player.last_name || player.name.split(' ').pop();
+  var firstName = player.first_name || player.name.split(' ').slice(0,-1).join(' ');
+  var pos = (player.position || 'mf').toLowerCase();
+
+  det.innerHTML =
+    '<div class="pd-header">' +
+      '<img class="pd-photo" src="' + photoSrc + '" alt="' + player.name + '"' +
+        " onerror=\"this.onerror=null;this.src='assets/silhouettes/" + pos + ".svg'\">" +
+      '<div class="pd-info">' +
+        '<div class="pd-name">' + lastName + ', ' + firstName + '</div>' +
+        '<div class="pd-meta">#' + player.number + ' \u00b7 ' + (player.position_detail || player.position) + ' \u00b7 ' + (player.club || '\u2014') + '</div>' +
+        '<div class="pd-stats">' +
+          '<span>' + (player.caps || 0) + ' caps</span> \u00b7 <span>' + (player.goals || 0) + ' goals</span>' +
+          (player.height ? ' \u00b7 ' + player.height : '') +
+          (player.preferred_foot ? ' \u00b7 ' + player.preferred_foot + ' foot' : '') +
+          (player.birth_location ? ' \u00b7 Born: ' + player.birth_location : '') +
+        '</div>' +
+        (socialLinks ? '<div class="pd-social">' + socialLinks + '</div>' : '') +
+      '</div>' +
+      '<button class="pd-close" onclick="document.getElementById(\'td-player-detail\').hidden=true" aria-label="Close player detail">\u2715</button>' +
+    '</div>' +
+    (player.bio ? '<p class="pd-bio">' + player.bio + '</p>' : '');
+  det.hidden = false;
+  det.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+async function toggleLyrics(btn) {
+  const lyricsDiv = document.getElementById('td-lyrics');
+  if (!lyricsDiv) return;
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  if (expanded) {
+    lyricsDiv.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = 'Show lyrics / subtitles';
+    return;
+  }
+  if (!lyricsDiv.dataset.loaded) {
+    const track = document.querySelector('#td-anthem-audio track');
+    if (track?.src) {
+      try {
+        const r = await fetch(track.src);
+        const vtt = await r.text();
+        const lines = vtt.split('\n')
+          .filter(l => l && !l.startsWith('WEBVTT') && !l.startsWith('NOTE')
+            && !/^\d+$/.test(l.trim())
+            && !l.includes('-->'))
+          .map(l => l.trim())
+          .filter(Boolean);
+        lyricsDiv.innerHTML = '<p style="font-family:var(--font-body);font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--chalk-dim)">'
+          + lines.join('\n').replace(/</g,'&lt;') + '</p>';
+        lyricsDiv.dataset.loaded = '1';
+      } catch(e) {
+        lyricsDiv.textContent = 'Lyrics unavailable.';
+      }
+    } else {
+      lyricsDiv.textContent = 'No subtitle track found.';
+    }
+  }
+  lyricsDiv.hidden = false;
+  btn.setAttribute('aria-expanded', 'true');
+  btn.textContent = 'Hide lyrics / subtitles';
+}
+
+function renderCountryProfile(data, container) {
+  const country = data?.country;
+  const anthem = data?.anthem;
+  const slug = data?.slug || '';
+  const meta = data?.meta || {};
+  const flagUrl = data?.flagUrl;
+  const flagCdnUrl = data?.flagCdnUrl || `https://flagcdn.com/${meta.flagcdn || 'un'}.svg`;
+  const fifaUrl = data?.fifaUrl || '#';
+
+  if (!country && !anthem) {
+    container.innerHTML = '<p class="td-loading" style="margin-top:10px">Country info unavailable.</p>';
+    return;
+  }
+
+  // Format number with comma separators
+  const fmt = n => n ? Number(n).toLocaleString('en') : '\u2014';
+  const fmtArea = n => n ? Number(n).toLocaleString('en') + ' km\u00B2' : '\u2014';
+
+  // Demographics cells
+  const cells = [
+    {label: 'Capital', val: country?.capital || '\u2014'},
+    {label: 'Population', val: fmt(country?.population)},
+    {label: 'Area', val: fmtArea(country?.area)},
+    {label: 'Region', val: country?.region || '\u2014'},
+    {label: 'Language(s)', val: Array.isArray(country?.languages) ? country.languages.slice(0,3).join(', ') : (country?.languages || '\u2014')},
+    {label: 'Currency', val: country?.currency || '\u2014'},
+    {label: 'Government', val: country?.governmentType || '\u2014'},
+    {label: 'Religion', val: country?.religion || '\u2014'},
+  ].filter(c => c.val && c.val !== '\u2014');
+
+  const gridHtml = cells.map(c =>
+    `<div class="cp-cell"><div class="cc-label">${c.label}</div><div class="cc-val">${c.val}</div></div>`
+  ).join('');
+
+  // Factoids
+  const facts = [];
+  if (country?.nationalDish) facts.push(`\uD83C\uDF7D National dish: <strong>${country.nationalDish}</strong>`);
+  if (country?.drivingSide) facts.push(`\uD83D\uDE97 Drives on the <strong>${country.drivingSide}</strong>`);
+  if (country?.lifeExpectancy) facts.push(`Life expectancy: <strong>${country.lifeExpectancy} yrs</strong>`);
+  const factoidsHtml = facts.length ?
+    `<div class="cp-factoids">${facts.map(f=>`<span>${f}</span>`).join('')}</div>` : '';
+
+  // Flag + country name row (moved before anthem to enable translation lookup)
+  const countryName = country?.name || data?.meta?.slug?.replace(/-/g,' ') || '';
+  const displayTeam = data?.roster?.team || countryName;
+
+  let anthemHtml = '';
+  if (anthem?.name) {
+    let audioHtml = '';
+    if (anthem.has_audio && anthem.audio_file) {
+      const audioSrc = `assets/teams/${slug}/${anthem.audio_file}`;
+      const tracks = (anthem.captions || []).map(c =>
+        `<track kind="subtitles" src="assets/teams/${slug}/${c.file}" srclang="${c.lang}" label="${c.label}">`
+      ).join('');
+      const hasLyrics = (anthem.captions || []).length > 0;
+      // MIDI fallback source element (browsers that support MIDI, or as download link)
+      const midiSrc = anthem.midi_file
+        ? `<source src="assets/teams/${slug}/${anthem.midi_file}" type="audio/midi">`
+        : '';
+      audioHtml = `
+        <audio controls preload="none" style="width:100%" id="td-anthem-audio">
+          <source src="${audioSrc}" type="audio/mp4">
+          ${midiSrc}
+          ${tracks}
+        </audio>
+        ${anthem.midi_file ? `<a href="assets/teams/${slug}/${anthem.midi_file}" download
+           class="td-lyrics-btn" style="margin-left:6px" title="Download MIDI">⬇ MIDI</a>` : ''}
+        ${hasLyrics ? `<button class="td-lyrics-btn" onclick="toggleLyrics(this)" aria-expanded="false">
+          Show lyrics / subtitles
+        </button>
+        <div class="td-lyrics" id="td-lyrics" hidden></div>` : ''}
+      `;
+    } else if (anthem.midi_file) {
+      // MIDI only (no m4a audio) — offer as download + try to play
+      audioHtml = `
+        <audio controls preload="none" style="width:100%" id="td-anthem-audio">
+          <source src="assets/teams/${slug}/${anthem.midi_file}" type="audio/midi">
+        </audio>
+        <a href="assets/teams/${slug}/${anthem.midi_file}" download
+           class="td-lyrics-btn" title="Download MIDI">⬇ MIDI</a>
+      `;
+    }
+    const trans = ANTHEM_TRANSLATIONS?.[displayTeam];
+    const anthemDisplay = trans
+      ? `<span class="cp-anthem-name">${trans[0]}</span>
+         ${trans[1] !== trans[0] ? '<span class="cp-anthem-eng" style="font-family:var(--font-body);font-size:12px;color:var(--chalk-dim);font-style:italic;display:block;margin-top:2px">"' + trans[1] + '"</span>' : ''}`
+      : `<span class="cp-anthem-name">${anthem.name}</span>`;
+    anthemHtml = `
+      <div class="cp-anthem">
+        <span class="cp-anthem-sub">National Anthem</span>
+        ${anthemDisplay}
+        ${audioHtml}
+      </div>
+    `;
+  }
+  const nickname = TEAM_NICKNAMES?.[displayTeam] || '';
+
+  // Anecdotes
+  const anecdotes = TEAM_ANECDOTES?.[displayTeam] || [];
+  const anecdotesHtml = anecdotes.length ? `
+    <div class="cp-anecdotes">
+      <div class="cp-anecdotes-title">The Good, The Bad & The Ugly</div>
+      ${anecdotes.map(a => '<p class="cp-anecdote">' + a + '</p>').join('')}
+    </div>
+  ` : '';
+
+  container.innerHTML = `
+    <div class="cp-flag-row">
+      <img src="${flagUrl}" alt="${countryName} flag"
+           onerror="this.onerror=null;this.src='${flagCdnUrl}'">
+      <span class="cp-country-name">${displayTeam}${nickname ? ' \u2014 <em style="color:var(--chalk-dim);font-family:var(--font-body);font-size:0.6em">' + nickname + '</em>' : ''}</span>
+    </div>
+    <div class="cp-grid">${gridHtml}</div>
+    ${factoidsHtml}
+    ${anecdotesHtml}
+    ${anthemHtml}
+    <div class="td-footer" style="padding:0;border:none;margin-top:8px">
+      <a href="${fifaUrl}" class="td-fifa-btn" target="_blank" rel="noopener">
+        View on FIFA.com \u2197
+      </a>
+      <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(countryName)}"
+         class="td-fifa-btn" style="background:var(--pitch-3);color:var(--chalk)"
+         target="_blank" rel="noopener">Wikipedia \u2197</a>
+    </div>
+  `;
+}
+
+function renderTeamProfile(data, teamName) {
+  const body = document.getElementById('td-body');
+  if (!data) {
+    body.innerHTML = '<p class="td-loading">Team profile unavailable \u2014 check your connection.</p>';
+    return;
+  }
+  const pitchContainer = document.createElement('div');
+  renderPitch(data, pitchContainer);
+  body.innerHTML = '';
+  body.appendChild(pitchContainer);
+
+  const cpDiv = document.createElement('div');
+  cpDiv.id = 'td-country-profile';
+  cpDiv.className = 'country-profile';
+  cpDiv.innerHTML = '<div class="td-loading">Loading country profile\u2026</div>';
+  body.appendChild(cpDiv);
+
+  if (typeof renderCountryProfile === 'function') {
+    renderCountryProfile(data, cpDiv);
+  }
+}
+
+/* ---- data loading layer ---- */
+
+function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), timeoutMs || 8000);
+  return fetch(url, {...(options||{}), signal: controller.signal})
+    .finally(() => clearTimeout(tid));
+}
+
+async function parseWikitextRoster(teamName) {
+  const url = 'https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_squads&prop=wikitext&format=json&origin=*';
+  try {
+    const r = await fetchWithTimeout(url, {}, 15000);
+    if (!r.ok) return null;
+    const data = await r.json();
+    const wikitext = data?.parse?.wikitext?.['*'] || '';
+
+    const sectionRe = new RegExp(`===\\s*${teamName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\s*===([\\s\\S]*?)(?====|$)`);
+    const sectionMatch = wikitext.match(sectionRe);
+    if (!sectionMatch) return null;
+
+    const section = sectionMatch[1];
+    const playerRe = /\{\{nat fs g player\|no=(\d+)\|pos=(\w+)\|name=\[\[(?:[^\]|]*\|)?([^\]]+)\]\]\|sortname=[^|]+(?:\|other=([^|]*))?\|age=\{\{birth date and age2\|\d+\|\d+\|\d+\|(\d{4})\|(\d+)\|(\d+)\}\}\|caps=(\d+)\|goals=(\d+)\|club=\[\[(?:[^\]|]*\|)?([^\]]+)\]\]\|clubnat=(\w+)\}\}/g;
+
+    const players = [];
+    let m;
+    while ((m = playerRe.exec(section)) !== null) {
+      const dob = `${m[5]}-${m[6].padStart(2,'0')}-${m[7].padStart(2,'0')}`;
+      const age = 2026 - parseInt(m[5]) - (parseInt(m[6]) > 6 || (parseInt(m[6]) === 6 && parseInt(m[7]) > 11) ? 1 : 0);
+      players.push({
+        number: parseInt(m[1]), position: m[2],
+        name: m[3].trim(), dob, age,
+        caps: parseInt(m[8]), goals: parseInt(m[9]),
+        club: m[10].trim(), club_nation: m[11],
+        captain: !!(m[4] && m[4].toLowerCase().includes('captain')),
+        photo: null
+      });
+    }
+    return players.length ? {team: teamName, players} : null;
+  } catch(e) { console.warn('Wikipedia roster fetch failed:', e); return null; }
+}
+
+async function loadTeamData(teamName) {
+  if (teamDataCache.has(teamName)) return teamDataCache.get(teamName);
+
+  const meta = TEAM_META?.[teamName];
+  if (!meta) { console.warn('No TEAM_META for:', teamName); return null; }
+  const {slug, iso2, flagcdn, qid} = meta;
+  const offline = !navigator.onLine;
+
+  let roster = null;
+  try {
+    const r = await fetchWithTimeout(`assets/teams/${slug}/roster.json`, {}, 5000);
+    if (r.ok) roster = await r.json();
+  } catch(e) {}
+
+  if (!roster && !offline) {
+    roster = await parseWikitextRoster(teamName);
+  }
+
+  let country = null;
+  try {
+    const r = await fetchWithTimeout(`assets/teams/${slug}/country.json`, {}, 5000);
+    if (r.ok) country = await r.json();
+  } catch(e) {}
+
+  if (!country && !offline) {
+    try {
+      const r = await fetchWithTimeout(`https://geoapi.info/api/country?code=${iso2.toUpperCase()}`, {}, 8000);
+      if (r.ok) {
+        const d = await r.json();
+        country = {
+          name: d.name, capital: d.capitalCity,
+          population: d.population, area: d.surfaceArea,
+          region: d.continent, languages: d.languages,
+          currency: `${d.currencyName} (${d.currencyCode})`,
+          governmentType: d.governmentType, religion: d.religion,
+          nationalDish: d.nationalDish, drivingSide: d.drivingSide,
+          lifeExpectancy: d.lifeExpectancy
+        };
+      }
+    } catch(e) {}
+  }
+
+  let anthem = null;
+  try {
+    const r = await fetchWithTimeout(`assets/teams/${slug}/anthem.json`, {}, 5000);
+    if (r.ok) anthem = await r.json();
+  } catch(e) {}
+
+
+
+  const flagUrl = `assets/teams/${slug}/flag.svg`;
+  const flagCdnUrl = `https://flagcdn.com/${flagcdn}.svg`;
+  const fifaUrl = `https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/teams/${slug}`;
+
+  const result = {slug, meta, roster, country, anthem, flagUrl, flagCdnUrl, fifaUrl};
+  teamDataCache.set(teamName, result);
+  return result;
+}
+
+/* ---- formation inference ---- */
+
+const FORMATION_POSITIONS = {
+  "4-3-3": [
+    {x:50,y:90},
+    {x:15,y:72},{x:37,y:75},{x:63,y:75},{x:85,y:72},
+    {x:28,y:50},{x:50,y:52},{x:72,y:50},
+    {x:18,y:22},{x:50,y:18},{x:82,y:22},
+  ],
+  "4-4-2": [
+    {x:50,y:90},
+    {x:12,y:72},{x:35,y:75},{x:65,y:75},{x:88,y:72},
+    {x:12,y:50},{x:37,y:52},{x:63,y:52},{x:88,y:50},
+    {x:32,y:20},{x:68,y:20},
+  ],
+  "4-4-2d": [
+    {x:50,y:90},
+    {x:12,y:72},{x:35,y:75},{x:65,y:75},{x:88,y:72},
+    {x:50,y:60},{x:28,y:48},{x:72,y:48},{x:50,y:36},
+    {x:32,y:20},{x:68,y:20},
+  ],
+  "3-5-2": [
+    {x:50,y:90},
+    {x:25,y:75},{x:50,y:78},{x:75,y:75},
+    {x:10,y:55},{x:30,y:50},{x:50,y:52},{x:70,y:50},{x:90,y:55},
+    {x:33,y:20},{x:67,y:20},
+  ],
+  "3-4-3": [
+    {x:50,y:90},
+    {x:25,y:75},{x:50,y:78},{x:75,y:75},
+    {x:15,y:55},{x:38,y:52},{x:62,y:52},{x:85,y:55},
+    {x:18,y:22},{x:50,y:18},{x:82,y:22},
+  ],
+  "4-2-3-1": [
+    {x:50,y:90},
+    {x:12,y:72},{x:35,y:75},{x:65,y:75},{x:88,y:72},
+    {x:35,y:57},{x:65,y:57},
+    {x:18,y:40},{x:50,y:40},{x:82,y:40},
+    {x:50,y:18},
+  ],
+  "5-3-2": [
+    {x:50,y:90},
+    {x:8,y:65},{x:25,y:75},{x:50,y:78},{x:75,y:75},{x:92,y:65},
+    {x:25,y:48},{x:50,y:50},{x:75,y:48},
+    {x:33,y:20},{x:67,y:20},
+  ],
+};
+
+function inferFormation(roster) {
+  const players = roster?.players || roster || [];
+  if (!players.length) return null;
+
+  // Sort: captain first, then by caps descending
+  const sorted = [...players].sort((a, b) => {
+    if (a.captain && !b.captain) return -1;
+    if (!a.captain && b.captain) return 1;
+    return (b.caps || 0) - (a.caps || 0);
+  });
+
+  // Count positions in full squad
+  const counts = {GK:0, DF:0, MF:0, FW:0};
+  players.forEach(p => { if (counts[p.position] !== undefined) counts[p.position]++; });
+
+  // Determine starting lineup (pick best 11)
+  const starters = [], subs = [];
+  const posStarters = {GK:0, DF:0, MF:0, FW:0};
+
+  // Target formation based on squad composition
+  let formation, dfCount, mfCount, fwCount;
+
+  // Use ratio of outfield positions to guess formation
+  const totalOutfield = counts.DF + counts.MF + counts.FW;
+  const dfRatio = counts.DF / totalOutfield;
+  const mfRatio = counts.MF / totalOutfield;
+  const fwRatio = counts.FW / totalOutfield;
+
+  if (dfRatio >= 0.38 && fwRatio <= 0.22) {
+    if (counts.DF >= 7) { formation="5-3-2"; dfCount=5; mfCount=3; fwCount=2; }
+    else { formation="4-4-2"; dfCount=4; mfCount=4; fwCount=2; }
+  } else if (mfRatio >= 0.40 && fwRatio <= 0.25) {
+    if (counts.DF <= 7) { formation="3-5-2"; dfCount=3; mfCount=5; fwCount=2; }
+    else { formation="4-2-3-1"; dfCount=4; mfCount=5; fwCount=1; }
+  } else if (fwRatio >= 0.28) {
+    if (counts.DF <= 7) { formation="3-4-3"; dfCount=3; mfCount=4; fwCount=3; }
+    else { formation="4-3-3"; dfCount=4; mfCount=3; fwCount=3; }
+  } else {
+    formation="4-3-3"; dfCount=4; mfCount=3; fwCount=3;
+  }
+
+  const targets = {GK:1, DF:dfCount, MF:mfCount, FW:fwCount};
+
+  // Fill starters by position priority
+  for (const player of sorted) {
+    const pos = player.position;
+    if (posStarters[pos] < (targets[pos] || 0)) {
+      starters.push(player);
+      posStarters[pos]++;
+    } else {
+      subs.push(player);
+    }
+  }
+
+  // If starters < 11, fill remaining with any available
+  for (const player of sorted) {
+    if (starters.length >= 11) break;
+    if (!starters.includes(player)) {
+      starters.push(player);
+      const idx = subs.indexOf(player);
+      if (idx > -1) subs.splice(idx, 1);
+    }
+  }
+
+  // Assign positions from FORMATION_POSITIONS
+  const coords = FORMATION_POSITIONS[formation] || FORMATION_POSITIONS["4-3-3"];
+
+  // Sort starters: GK first, then DF, MF, FW (for coordinate assignment)
+  const posOrder = {GK:0, DF:1, MF:2, FW:3};
+  const orderedStarters = [...starters].sort((a,b) => (posOrder[a.position]||2) - (posOrder[b.position]||2));
+
+  const positions = orderedStarters.map((player, i) => ({
+    player,
+    x: coords[i]?.x ?? 50,
+    y: coords[i]?.y ?? 50,
+  }));
+
+  return {formation, starters: orderedStarters, subs, positions};
+}
+
+/* delegated team-link click handlers */
+document.getElementById("list").addEventListener("click",e=>{
+  const link=e.target.closest(".team-link");
+  if(link){e.preventDefault();e.stopPropagation();showTeamDialog(link.dataset.team);}
+});
+document.getElementById("groupsGrid").addEventListener("click",e=>{
+  const link=e.target.closest(".team-link");
+  if(link){e.preventDefault();e.stopPropagation();showTeamDialog(link.dataset.team);}
+});
+ document.getElementById("standingsStrip").addEventListener("click",e=>{
+  const link=e.target.closest(".team-link");
+  if(link){e.preventDefault();e.stopPropagation();showTeamDialog(link.dataset.team);}
+});
+document.getElementById("kickoff").addEventListener("click",e=>{
+  const link=e.target.closest(".team-link");
+  if(link){e.preventDefault();e.stopPropagation();showTeamDialog(link.dataset.team);}
+});
+</script>
+
 </body>
 </html>

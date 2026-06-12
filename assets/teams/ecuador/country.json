@@ -1,0 +1,17 @@
+{
+  "name": "Ecuador",
+  "capital": "Quito",
+  "population": 17084357,
+  "area": 283561,
+  "region": "South America",
+  "languages": [
+    "Ket¬öua",
+    "Spanish"
+  ],
+  "currency": "Ecuador Sucre (ECS)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Encebollado, Fritada,Guatitas,",
+  "drivingSide": "right",
+  "lifeExpectancy": 71.1
+}

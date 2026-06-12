@@ -1,0 +1,19 @@
+{
+  "name": "Paraguay",
+  "capital": "Asunción",
+  "population": 6956071,
+  "area": 406752,
+  "region": "South America",
+  "languages": [
+    "German",
+    "Guaran√≠",
+    "Portuguese",
+    "Spanish"
+  ],
+  "currency": "Paraguay Guarani (PYG)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Sopa paraguaya",
+  "drivingSide": "right",
+  "lifeExpectancy": 73.7
+}

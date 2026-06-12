@@ -1,0 +1,16 @@
+{
+  "name": "Uruguay",
+  "capital": "Montevideo",
+  "population": 3449299,
+  "area": 175016,
+  "region": "South America",
+  "languages": [
+    "Spanish"
+  ],
+  "currency": "Uruguayan Peso (UYU)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Asado, Chivito",
+  "drivingSide": "right",
+  "lifeExpectancy": 75.2
+}

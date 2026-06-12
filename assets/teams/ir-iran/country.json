@@ -1,0 +1,25 @@
+{
+  "name": "Iran",
+  "capital": "Tehran",
+  "population": 81800269,
+  "area": 1648195,
+  "region": "Asia",
+  "languages": [
+    "Arabic",
+    "Azerbaijani",
+    "Bakhtyari",
+    "Balochi",
+    "Gilaki",
+    "Kurdish",
+    "Luri",
+    "Mazandarani",
+    "Persian",
+    "Turkmenian"
+  ],
+  "currency": "Iranian Rial (IRR)",
+  "governmentType": "Islamic Republic",
+  "religion": "Islam",
+  "nationalDish": "Chelo kabab, Ghormeh sabzi",
+  "drivingSide": "right",
+  "lifeExpectancy": 69.7
+}

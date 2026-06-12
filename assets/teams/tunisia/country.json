@@ -1,0 +1,18 @@
+{
+  "name": "Tunisia",
+  "capital": "Tunis",
+  "population": 11565204,
+  "area": 163610,
+  "region": "Africa",
+  "languages": [
+    "Arabic",
+    "Arabic-French",
+    "Arabic-French-English"
+  ],
+  "currency": "Tunisian Dollar (TND)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Couscous, Kabkabou",
+  "drivingSide": "right",
+  "lifeExpectancy": 73.7
+}

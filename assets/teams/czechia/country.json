@@ -1,0 +1,23 @@
+{
+  "name": "Czech Republic",
+  "capital": "Praha",
+  "population": 10629928,
+  "area": 78866,
+  "region": "Europe",
+  "languages": [
+    "Czech",
+    "German",
+    "Hungarian",
+    "Moravian",
+    "Polish",
+    "Romani",
+    "Silesiana",
+    "Slovak"
+  ],
+  "currency": "Czech Koruna (CZK)",
+  "governmentType": "Republic",
+  "religion": null,
+  "nationalDish": "roast pork with dumplings and sauerkraut",
+  "drivingSide": "right",
+  "lifeExpectancy": 74.5
+}

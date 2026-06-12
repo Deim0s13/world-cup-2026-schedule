@@ -1,0 +1,17 @@
+{
+  "name": "England",
+  "capital": "London",
+  "population": 56000000,
+  "area": 130279,
+  "region": "Europe",
+  "subregion": "Northern Europe",
+  "languages": [
+    "English"
+  ],
+  "currency": "British pound (GBP)",
+  "governmentType": "Constitutional monarchy (devolved)",
+  "religion": "Christianity",
+  "nationalDish": "Chicken tikka masala",
+  "drivingSide": "left",
+  "lifeExpectancy": 81.3
+}

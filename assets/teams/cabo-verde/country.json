@@ -1,0 +1,17 @@
+{
+  "name": "Cape Verde",
+  "capital": "Praia",
+  "population": 0,
+  "area": 4033,
+  "region": "Africa",
+  "languages": [
+    "Crioulo",
+    "Portuguese"
+  ],
+  "currency": "Cape Verde Escudo (CVE)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Cachupa",
+  "drivingSide": "right",
+  "lifeExpectancy": 68.9
+}

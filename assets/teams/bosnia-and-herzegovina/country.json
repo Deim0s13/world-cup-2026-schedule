@@ -1,0 +1,16 @@
+{
+  "name": "Bosnia and Herzegovina",
+  "capital": "Sarajevo",
+  "population": 3323929,
+  "area": 51197,
+  "region": "Europe",
+  "languages": [
+    "Bosnian"
+  ],
+  "currency": "Convertible Mark (BAM)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Bosnian pot",
+  "drivingSide": "right",
+  "lifeExpectancy": 71.5
+}

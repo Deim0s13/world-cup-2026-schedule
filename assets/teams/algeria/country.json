@@ -1,0 +1,17 @@
+{
+  "name": "Algeria",
+  "capital": "Alger",
+  "population": 42228429,
+  "area": 2381741,
+  "region": "Africa",
+  "languages": [
+    "Arabic",
+    "Berberi"
+  ],
+  "currency": "Algerian Dinar (DZD)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Couscous",
+  "drivingSide": "right",
+  "lifeExpectancy": 69.7
+}

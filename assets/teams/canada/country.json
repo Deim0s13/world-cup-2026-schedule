@@ -1,0 +1,27 @@
+{
+  "name": "Canada",
+  "capital": "Ottawa",
+  "population": 37057765,
+  "area": 9970610,
+  "region": "North America",
+  "languages": [
+    "Chinese",
+    "Dutch",
+    "English",
+    "Eskimo Languages",
+    "French",
+    "German",
+    "Italian",
+    "Polish",
+    "Portuguese",
+    "Punjabi",
+    "Spanish",
+    "Ukrainian"
+  ],
+  "currency": "Canadian Dollar (CAD)",
+  "governmentType": "Constitutional Monarchy, Federation",
+  "religion": "Christianity",
+  "nationalDish": "Kraft Dinner",
+  "drivingSide": "right",
+  "lifeExpectancy": 79.4
+}

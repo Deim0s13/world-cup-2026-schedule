@@ -1,0 +1,17 @@
+{
+  "name": "Egypt",
+  "capital": "Cairo",
+  "population": 98423595,
+  "area": 1001449,
+  "region": "Africa",
+  "languages": [
+    "Arabic",
+    "Sinaberberi"
+  ],
+  "currency": "Egyptian Pound (EGP)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Ful medames, kushari,",
+  "drivingSide": "right",
+  "lifeExpectancy": 63.3
+}

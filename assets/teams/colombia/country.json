@@ -1,0 +1,20 @@
+{
+  "name": "Colombia",
+  "capital": "Bogota",
+  "population": 49648685,
+  "area": 1138914,
+  "region": "South America",
+  "languages": [
+    "Arawakan",
+    "Caribbean",
+    "Chibcha",
+    "Creole English",
+    "Spanish"
+  ],
+  "currency": "Colombian Peso (COP)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Ajiaco, Bandeja paisa",
+  "drivingSide": "right",
+  "lifeExpectancy": 70.3
+}

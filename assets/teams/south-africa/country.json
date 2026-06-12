@@ -1,0 +1,26 @@
+{
+  "name": "South Africa",
+  "capital": "Pretoria",
+  "population": 57779622,
+  "area": 1221037,
+  "region": "Africa",
+  "languages": [
+    "Afrikaans",
+    "English",
+    "Ndebele",
+    "Northsotho",
+    "Southsotho",
+    "Swazi",
+    "Tsonga",
+    "Tswana",
+    "Venda",
+    "Xhosa",
+    "Zulu"
+  ],
+  "currency": "South African Rand (ZAR)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Bobotie",
+  "drivingSide": "left",
+  "lifeExpectancy": 51.1
+}

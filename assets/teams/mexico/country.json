@@ -1,0 +1,21 @@
+{
+  "name": "Mexico",
+  "capital": "Ciudad de M",
+  "population": 126190788,
+  "area": 1958201,
+  "region": "North America",
+  "languages": [
+    "Mixtec",
+    "N√°huatl",
+    "Otom√≠",
+    "Spanish",
+    "Yucatec",
+    "Zapotec"
+  ],
+  "currency": "Mexican Nuevo Peso (MXN)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Tacos, Mole poblano,Chiles en nogada",
+  "drivingSide": "right",
+  "lifeExpectancy": 71.5
+}

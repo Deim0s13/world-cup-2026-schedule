@@ -1,0 +1,20 @@
+{
+  "name": "Ivory Coast",
+  "capital": "Yamoussoukro",
+  "population": 25069229,
+  "area": 322463,
+  "region": "Africa",
+  "languages": [
+    "Akan",
+    "Gur",
+    "Kru",
+    "Malinke",
+    "[South]Mande"
+  ],
+  "currency": "CFA Franc BCEAO (XOF)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Fufu, Kedjenou",
+  "drivingSide": "right",
+  "lifeExpectancy": 45.2
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Brazil",
+  "capital": "Brasília",
+  "population": 209469333,
+  "area": 8547403,
+  "region": "South America",
+  "languages": [
+    "German",
+    "Indian Languages",
+    "Italian",
+    "Japanese",
+    "Portuguese"
+  ],
+  "currency": "Brazilian Real (BRL)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Feijoada",
+  "drivingSide": "right",
+  "lifeExpectancy": 62.9
+}

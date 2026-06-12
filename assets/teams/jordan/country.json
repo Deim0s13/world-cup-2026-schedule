@@ -1,0 +1,18 @@
+{
+  "name": "Jordan",
+  "capital": "Amman",
+  "population": 9956011,
+  "area": 88946,
+  "region": "Asia",
+  "languages": [
+    "Arabic",
+    "Armenian",
+    "Circassian"
+  ],
+  "currency": "Jordanian Dinar (JOD)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Islam",
+  "nationalDish": "Mansaf",
+  "drivingSide": "right",
+  "lifeExpectancy": 77.4
+}

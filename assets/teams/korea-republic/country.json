@@ -1,0 +1,17 @@
+{
+  "name": "South Korea",
+  "capital": "Seoul",
+  "population": 51606633,
+  "area": 99434,
+  "region": "Asia",
+  "languages": [
+    "Chinese",
+    "Korean"
+  ],
+  "currency": "Korean Won (KRW)",
+  "governmentType": "Republic",
+  "religion": null,
+  "nationalDish": "Kimchi, bulgogi",
+  "drivingSide": "right",
+  "lifeExpectancy": 74.4
+}

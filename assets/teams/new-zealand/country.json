@@ -1,0 +1,17 @@
+{
+  "name": "New Zealand",
+  "capital": "Wellington",
+  "population": 4841000,
+  "area": 270534,
+  "region": "Oceania",
+  "languages": [
+    "English",
+    "Maori"
+  ],
+  "currency": "New Zealand Dollar (NZD)",
+  "governmentType": "Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Bacon and egg pie, lamb, pavlova",
+  "drivingSide": "left",
+  "lifeExpectancy": 77.8
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Turkey",
+  "capital": "Ankara",
+  "population": 82319724,
+  "area": 774815,
+  "region": "Asia",
+  "languages": [
+    "Arabic",
+    "Kurdish",
+    "Turkish"
+  ],
+  "currency": "Turkish Lira (TRY)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Döner kebab, Kuru fasulye with pilav",
+  "drivingSide": "right",
+  "lifeExpectancy": 71
+}

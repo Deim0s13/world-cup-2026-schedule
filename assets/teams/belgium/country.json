@@ -1,0 +1,21 @@
+{
+  "name": "Belgium",
+  "capital": "Bruxelles [Brussel]",
+  "population": 11433256,
+  "area": 30518,
+  "region": "Europe",
+  "languages": [
+    "Arabic",
+    "Dutch",
+    "French",
+    "German",
+    "Italian",
+    "Turkish"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Federation Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Moules-frites",
+  "drivingSide": "right",
+  "lifeExpectancy": 77.8
+}

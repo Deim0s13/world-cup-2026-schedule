@@ -1,0 +1,21 @@
+{
+  "name": "Senegal",
+  "capital": "Dakar",
+  "population": 15854360,
+  "area": 196722,
+  "region": "Africa",
+  "languages": [
+    "Diola",
+    "Ful",
+    "Malinke",
+    "Serer",
+    "Soninke",
+    "Wolof"
+  ],
+  "currency": "CFA Franc BCEAO (XOF)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Thieboudienne",
+  "drivingSide": "right",
+  "lifeExpectancy": 62.2
+}

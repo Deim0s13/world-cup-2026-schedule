@@ -1,0 +1,23 @@
+{
+  "name": "Austria",
+  "capital": "Wien",
+  "population": 8840521,
+  "area": 83859,
+  "region": "Europe",
+  "languages": [
+    "Czech",
+    "German",
+    "Hungarian",
+    "Polish",
+    "Romanian",
+    "Serbo-Croatian",
+    "Slovene",
+    "Turkish"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Wiener schnitzel, Tafelspitz",
+  "drivingSide": "right",
+  "lifeExpectancy": 77.7
+}

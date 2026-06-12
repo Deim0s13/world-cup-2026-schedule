@@ -1,0 +1,16 @@
+{
+  "name": "Portugal",
+  "capital": "Lisboa",
+  "population": 10283822,
+  "area": 91982,
+  "region": "Europe",
+  "languages": [
+    "Portuguese"
+  ],
+  "currency": "Euro (EUR)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Bacalhau",
+  "drivingSide": "right",
+  "lifeExpectancy": 75.8
+}

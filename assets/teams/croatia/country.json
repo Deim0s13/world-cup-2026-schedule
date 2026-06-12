@@ -1,0 +1,17 @@
+{
+  "name": "Croatia",
+  "capital": "Zagreb",
+  "population": 4087843,
+  "area": 56538,
+  "region": "Europe",
+  "languages": [
+    "Serbo-Croatian",
+    "Slovene"
+  ],
+  "currency": "Croatian Kuna (EUR)",
+  "governmentType": "Republic",
+  "religion": "Christianity",
+  "nationalDish": "Istrian stew",
+  "drivingSide": "right",
+  "lifeExpectancy": 73.7
+}

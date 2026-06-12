@@ -1,0 +1,20 @@
+{
+  "name": "Iraq",
+  "capital": "Baghdad",
+  "population": 38433600,
+  "area": 438317,
+  "region": "Asia",
+  "languages": [
+    "Arabic",
+    "Assyrian",
+    "Azerbaijani",
+    "Kurdish",
+    "Persian"
+  ],
+  "currency": "Iraqi Dinar (IQD)",
+  "governmentType": "Republic",
+  "religion": "Islam",
+  "nationalDish": "Samak masgouf,Kleicha",
+  "drivingSide": "right",
+  "lifeExpectancy": 66.5
+}

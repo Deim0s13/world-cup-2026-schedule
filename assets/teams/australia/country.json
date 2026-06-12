@@ -1,0 +1,23 @@
+{
+  "name": "Australia",
+  "capital": "Canberra",
+  "population": 24982688,
+  "area": 7741220,
+  "region": "Oceania",
+  "languages": [
+    "Arabic",
+    "Canton Chinese",
+    "English",
+    "German",
+    "Greek",
+    "Italian",
+    "Serbo-Croatian",
+    "Vietnamese"
+  ],
+  "currency": "Australian Dollar (AUD)",
+  "governmentType": "Federation Constitutional Monarchy",
+  "religion": "Christianity",
+  "nationalDish": "Meat pie,Roast lamb",
+  "drivingSide": "left",
+  "lifeExpectancy": 79.8
+}

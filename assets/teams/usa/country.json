@@ -1,0 +1,27 @@
+{
+  "name": "United States",
+  "capital": "Washington",
+  "population": 326687501,
+  "area": 9363520,
+  "region": "North America",
+  "languages": [
+    "Chinese",
+    "English",
+    "French",
+    "German",
+    "Italian",
+    "Japanese",
+    "Korean",
+    "Polish",
+    "Portuguese",
+    "Spanish",
+    "Tagalog",
+    "Vietnamese"
+  ],
+  "currency": "US Dollar (USD)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Hamburger, Hot dog, Fried chicken, Buffalo wings, Apple pie",
+  "drivingSide": "right",
+  "lifeExpectancy": 77.1
+}

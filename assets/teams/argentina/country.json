@@ -1,0 +1,18 @@
+{
+  "name": "Argentina",
+  "capital": "Buenos Aires",
+  "population": 44494502,
+  "area": 2780400,
+  "region": "South America",
+  "languages": [
+    "Indian Languages",
+    "Italian",
+    "Spanish"
+  ],
+  "currency": "Argentine Peso (ARS)",
+  "governmentType": "Federal Republic",
+  "religion": "Christianity",
+  "nationalDish": "Asado",
+  "drivingSide": "right",
+  "lifeExpectancy": 75.1
+}

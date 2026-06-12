@@ -1,0 +1,18 @@
+{
+  "name": "Scotland",
+  "capital": "Edinburgh",
+  "population": 5500000,
+  "area": 77933,
+  "region": "Europe",
+  "subregion": "Northern Europe",
+  "languages": [
+    "English",
+    "Scottish Gaelic"
+  ],
+  "currency": "British pound (GBP)",
+  "governmentType": "Devolved parliamentary democracy",
+  "religion": "Christianity",
+  "nationalDish": "Haggis",
+  "drivingSide": "left",
+  "lifeExpectancy": 79.1
+}
