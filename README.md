@@ -1,23 +1,25 @@
 # World Cup 26 Wallchart
 
-A single-file interactive wallchart for all 104 matches of the 2026 FIFA World Cup (11 June – 19 July). Filter by group, stage or team, switch timezones, and see live scores update automatically.
+A single-file interactive wallchart for all 104 matches of the 2026 FIFA World Cup (11 June – 19 July). Filter by group, stage, team or date; switch timezones; watch live scores, lineups and substitutions update automatically; and click any played match for full post-match stats.
 
 **Live version: [wc26-wallchart.duckdns.org](https://wc26-wallchart.duckdns.org/world-cup-2026-schedule_1.html)**
 
 ## Features
 
-- All 104 matches with correct IST kick-off times and dates
-- Live scores, elapsed time, half-time indicator, and goal scorers via the ESPN scoreboard API — no API key required, polls every 2 minutes; group standings via [worldcup26.ir](https://worldcup26.ir)
-- Header banner counts down to the next kick-off; switches to live score during a match; reverts to countdown when the final whistle goes
+- All 104 matches with correct kick-off times and dates
+- Live scores, elapsed time, half-time indicator, and goal scorers via the ESPN scoreboard API — no API key required, polls every 2 minutes
+- Header banner counts down to the next kick-off; switches to live score during a match; reverts to countdown when the final whistle goes. When several matches are live at once, it shows them side by side
+- During a live match, the banner expands to show both **starting XIs and formations**, with **substitutions** appearing as they happen and subbed-off players struck through (via the ESPN match summary)
+- **Click any finished or in-play match to expand a post-match detail panel** — a team-stat comparison (possession, shots, shots on target, corners, fouls, offsides, cards, passes, saves) shown as two-tone bars, plus a full event timeline of goals, cards, and substitutions
 - Knockout stage team names update automatically once teams qualify — placeholder labels (e.g. "Winner Group A") are replaced with real country names as the API confirms them
 - In-play matches show a live score with pulsing indicator and current minute
 - Full-time matches show the final score with FT stamp, losing team dimmed, and goal scorers listed under each team name
 - Venue (city · stadium) displayed for every match
-- Filter by group, stage, or team search
+- Filter by group, stage, team search, or **match day** (date selector listing every day with fixtures, timezone-aware)
 - Timezone conversion — remembers your preference via localStorage
 - Late-night kick-off indicator (☾)
-- Live group standings (MP, W, D, L, GD, Pts) with flags — visible as a table in the Groups view and as an inline strip above the schedule when a group filter is active; top 2 qualification places highlighted
-- Opt-in match alerts — browser notification 15 minutes before each kick-off (requires page to be open)
+- Group standings computed live from match results (MP, W, D, L, GD, Pts) with flags — visible as a table in the Groups view and as an inline strip above the schedule when a group filter is active; top 2 qualification places highlighted
+- Opt-in match alerts — browser notification 15 minutes before each kick-off (requires page to be open; desktop and installed-PWA only, and automatically hidden where the browser doesn't expose notifications, e.g. mobile Safari)
 - Installable as a PWA on iOS, Android, and desktop — add to home screen for a full-screen app experience
 
 ## Running locally
@@ -30,7 +32,14 @@ python3 server.py
 
 Then open `http://localhost:8191/world-cup-2026-schedule_1.html`.
 
-> `server.py` serves static files and proxies `/api/*` requests to the scores API on the server side, bypassing browser CORS restrictions. Using `python3 -m http.server` will serve the page but live scores won't load.
+> `server.py` serves static files and proxies the upstream APIs server-side, bypassing browser CORS restrictions (and slimming the large match-summary payload down before it reaches the browser). Using `python3 -m http.server` will serve the page but live scores won't load. The proxy routes are:
+>
+> | Route | Upstream | Purpose |
+> |-------|----------|---------|
+> | `/scores` | ESPN scoreboard | Live & final scores, elapsed time, goal scorers |
+> | `/flags` | worldcup26.ir | Team flags for the standings tables |
+> | `/lineup?event=ID` | ESPN match summary | Starting XIs, formations, substitutions (slimmed to ~3 KB) |
+> | `/matchdata?event=ID` | ESPN match summary | Post-match team stats + event timeline (slimmed to ~3 KB) |
 
 ## Running as an interactive desktop wallpaper (macOS)
 
@@ -93,7 +102,9 @@ launchctl unload ~/Library/LaunchAgents/dev.YOUR_USERNAME.wallchart-server.plist
 
 | Data | Source |
 |------|--------|
-| Match schedule & times | Verified against Sky Sports BST kick-off times |
+| Match schedule & times | Verified against Sky Sports kick-off times |
 | Live scores, elapsed time & goal scorers | ESPN unofficial scoreboard API (no key, ~9s refresh) |
-| Group standings & team flags | [worldcup26.ir](https://worldcup26.ir) (free, no key) |
-| Venues | worldcup26.ir stadiums endpoint |
+| Lineups, formations, substitutions, post-match stats & timeline | ESPN unofficial match-summary API (no key) |
+| Group standings | Computed in-browser from finished ESPN results (no external standings API) |
+| Team flags | [worldcup26.ir](https://worldcup26.ir) (free, no key) |
+| Venues | Built-in lookup table in the page |
