@@ -985,6 +985,20 @@ function renderMatchDetail(data){
 
 const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
+// ESPN position codes → common football abbreviations for the live lineup.
+const POS_MAP={
+  G:"GK",
+  CD:"CB","CD-L":"CB","CD-R":"CB",
+  LB:"LB",RB:"RB",
+  DM:"CDM",
+  M:"CM",CM:"CM","CM-L":"CM","CM-R":"CM",
+  LM:"LM",RM:"RM",
+  AM:"CAM","AM-L":"LW","AM-R":"RW",
+  LF:"LW",RF:"RW",
+  "CF-L":"ST","CF-R":"ST",F:"ST",
+};
+const simplifyPos=p=>POS_MAP[p]||p; // unknown/new codes pass through unchanged
+
 // Render both starting XIs (sorted by formation place), formation, and per-team
 // substitutions for a live match. lu = {rosters,subs} from the /lineup proxy.
 // h/a are the normalized home/away display names used to align rosters to sides.
@@ -997,7 +1011,7 @@ function renderLineup(lu,h,a){
     if(!roster||!roster.xi||!roster.xi.length)return '<div class="lm-side '+cls+'"></div>';
     const xi=roster.xi.slice().sort((x,y)=>(x.place||0)-(y.place||0));
     const players=xi.map(p=>'<li'+(p.off?' class="off"':'')+'>'
-      +'<i>'+esc(p.j)+'</i> '+esc(p.n)+' <em>'+esc(p.pos)+'</em></li>').join('');
+      +'<i>'+esc(p.j)+'</i> '+esc(p.n)+' <em>'+esc(simplifyPos(p.pos))+'</em></li>').join('');
     const teamSubs=subs.filter(s=>normName(s.team)===normName(roster.team));
     const subList=teamSubs.length
       ?'<div class="lm-sub-list">'+teamSubs.map(s=>'<div class="lm-sub">'
