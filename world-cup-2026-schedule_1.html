@@ -120,6 +120,21 @@ button{font-family:inherit;cursor:pointer}
   font-variant-numeric:tabular-nums;
 }
 .lm-venue{font-family:var(--font-mono);font-size:10px;color:var(--chalk-faint);margin-top:2px}
+/* live lineups: two team columns (home right / away left), XI + formation + subs */
+.lm-lineups{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.lm-side{flex:1;min-width:0}
+.lm-side-home{text-align:right}
+.lm-side-away{text-align:left}
+.lm-form{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:#4dc97b;margin-bottom:6px}
+.lm-xi{list-style:none;margin:0;padding:0;font-size:11px;line-height:1.7;color:var(--chalk-dim)}
+.lm-xi li.off{opacity:.45;text-decoration:line-through}
+.lm-xi i{font-style:normal;font-family:var(--font-mono);color:var(--chalk-faint);font-size:10px;display:inline-block;min-width:15px}
+.lm-xi em{font-style:normal;font-family:var(--font-mono);color:var(--chalk-faint);font-size:9px}
+.lm-sub-list{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+.lm-sub{font-family:var(--font-mono);font-size:10px;line-height:1.7;color:var(--chalk-faint)}
+.lm-sub .m{color:#4dc97b}
+.lm-sub .on{color:var(--chalk-dim)}
+.lm-sub .off-p{opacity:.6}
 @media(max-width:560px){
   .live-match{border-left:none;border-top:1px solid var(--line);padding:12px 0 0;margin-top:12px}
   .live-match:first-child{border-top:none;margin-top:0}
@@ -535,6 +550,7 @@ let scores=new Map();
 const teamOverrides=new Map();
 let groupStandings=new Map();
 let flagByName=new Map(); // team display name → flag URL, populated by fetchStandings
+let lineups=new Map();    // ESPN event id → {rosters:[{team,formation,xi}], subs:[{m,team,on,off}]}
 
 /* build stage pills */
 const stageRow=$("stageRow");
@@ -711,7 +727,7 @@ async function fetchScores(){
         .map(d=>(d.athletesInvolved?.[0]?.displayName||"")+" "+d.clock?.displayValue).map(s=>s.trim()).filter(Boolean);
       map.set(home+"|"+away,{
         home:homeComp.score,away:awayComp.score,
-        finished,live,elapsed,half,homeScorers,awayScorers,
+        finished,live,elapsed,half,homeScorers,awayScorers,id:ev.id,
       });
       // patch knockout team names — match ESPN event to D array by epoch (±10 min)
       const evEpoch=new Date(ev.date).getTime();
@@ -723,9 +739,27 @@ async function fetchScores(){
     updateBanner();
     scheduleNotifications();
     render();
+    fetchLineups(); // refresh XI/subs for any live matches (optional, fire-and-forget)
   }catch(e){
     console.warn("Score fetch failed:",e);
   }
+}
+
+// Fetch starting XI + formation + subs for each live match. Per-match call to the
+// /lineup proxy (ESPN summary, slimmed). Optional — failures never block the banner.
+async function fetchLineups(){
+  const liveIds=[...scores.values()].filter(s=>s.live&&s.id).map(s=>s.id);
+  await Promise.all(liveIds.map(async id=>{
+    try{
+      const res=await fetch("/lineup?event="+id,{cache:"no-store"});
+      if(!res.ok)return;
+      lineups.set(id,await res.json());
+    }catch(e){/* lineup is optional */}
+  }));
+  // drop lineups for matches no longer live so the banner stays in sync
+  const keep=new Set(liveIds);
+  [...lineups.keys()].forEach(k=>{if(!keep.has(k))lineups.delete(k);});
+  updateBanner();
 }
 
 function render(){
@@ -795,6 +829,35 @@ function render(){
   renderStrip();
 }
 
+const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+// Render both starting XIs (sorted by formation place), formation, and per-team
+// substitutions for a live match. lu = {rosters,subs} from the /lineup proxy.
+// h/a are the normalized home/away display names used to align rosters to sides.
+function renderLineup(lu,h,a){
+  if(!lu||!lu.rosters||lu.rosters.length<2)return '';
+  const homeR=lu.rosters.find(r=>normName(r.team)===h)||lu.rosters[0];
+  const awayR=lu.rosters.find(r=>normName(r.team)===a)||lu.rosters[1];
+  const subs=lu.subs||[];
+  const side=(roster,cls)=>{
+    if(!roster||!roster.xi||!roster.xi.length)return '<div class="lm-side '+cls+'"></div>';
+    const xi=roster.xi.slice().sort((x,y)=>(x.place||0)-(y.place||0));
+    const players=xi.map(p=>'<li'+(p.off?' class="off"':'')+'>'
+      +'<i>'+esc(p.j)+'</i> '+esc(p.n)+' <em>'+esc(p.pos)+'</em></li>').join('');
+    const teamSubs=subs.filter(s=>normName(s.team)===normName(roster.team));
+    const subList=teamSubs.length
+      ?'<div class="lm-sub-list">'+teamSubs.map(s=>'<div class="lm-sub">'
+        +'<span class="m">'+esc(s.m)+'</span> '
+        +'<span class="on">▲ '+esc(s.on)+'</span> '
+        +'<span class="off-p">▼ '+esc(s.off)+'</span></div>').join('')+'</div>'
+      :'';
+    return '<div class="lm-side '+cls+'">'
+      +(roster.formation?'<div class="lm-form">'+esc(roster.formation)+'</div>':'')
+      +'<ol class="lm-xi">'+players+'</ol>'+subList+'</div>';
+  };
+  return '<div class="lm-lineups">'+side(homeR,'lm-side-home')+side(awayR,'lm-side-away')+'</div>';
+}
+
 /* dynamic banner — next match countdown / live indicator */
 function updateBanner(){
   const now=Date.now();
@@ -832,6 +895,7 @@ function updateBanner(){
       const aScorers=sc?.awayScorers?.length
         ?'<span class="lm-scorers">'+sc.awayScorers.join('<br>')+'</span>':'';
       const venue=VENUES[r[0]]||'';
+      const lineupHtml=sc?.id?renderLineup(lineups.get(sc.id),h,a):'';
       return '<div class="live-match">'
         +'<div class="lm-header"><span class="lm-dot"></span>'
         +'<span class="lm-meta">'+stageLabel+' · Match '+r[0]+'</span>'
@@ -842,6 +906,7 @@ function updateBanner(){
         +'<div class="lm-team lm-away"><span class="lm-name">'+a+'</span>'+aScorers+'</div>'
         +'</div>'
         +(venue?'<div class="lm-venue">'+venue+'</div>':'')
+        +lineupHtml
         +'</div>';
     }).join('');
     el.className="kickoff live";
