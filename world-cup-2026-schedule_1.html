@@ -336,6 +336,13 @@ button{font-family:inherit;cursor:pointer}
 .gc-standings td.tn{max-width:85px;overflow:hidden;text-overflow:ellipsis;padding-right:8px;color:var(--chalk)}
 .gc-standings td.pts{font-weight:700;color:var(--chalk);padding-right:14px}
 .gc-standings td.num{text-align:center}
+/* best third-placed teams table (bottom of Groups view) */
+.third-place{margin-top:32px;max-width:580px}
+.tp-title{font-family:var(--font-display);font-size:20px;color:var(--chalk);margin-bottom:6px}
+.tp-note{color:var(--chalk-faint);font-size:12px;font-family:var(--font-mono);line-height:1.5;margin-bottom:14px}
+#thirdPlaceTable{background:var(--pitch-2);border:1px solid var(--line);border-radius:var(--radius);padding:6px 4px}
+.tp-table td.grp,.tp-table th:nth-child(2){text-align:center;font-weight:700;width:24px}
+.gc-standings tr.cut td{border-bottom:2px solid rgba(77,201,123,.5)}
 /* inline standings strip above schedule */
 .standings-strip{display:none;margin-bottom:14px;background:var(--pitch-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 .standings-strip table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px}
@@ -451,6 +458,11 @@ footer .mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;te
   <section class="groups" id="groupsView" aria-label="Group overview">
     <p class="hint">Tap a group to see its six fixtures →</p>
     <div class="groups-grid" id="groupsGrid"></div>
+    <section class="third-place" id="thirdPlaceView" aria-label="Best third-placed teams">
+      <h2 class="tp-title">Race for the Round of 32 — best third-placed teams</h2>
+      <p class="tp-note">Top 2 in every group qualify automatically; the 8 best of the 12 third-placed teams join them in the Round of 32. Updates as group games finish.</p>
+      <div id="thirdPlaceTable"></div>
+    </section>
   </section>
 </main>
 
@@ -1118,6 +1130,38 @@ function computeStandings(){
   groupStandings=result;
   renderGroups();
   renderStrip();
+  renderThirdPlace();
+}
+
+// Cross-group ranking of the 12 third-placed teams; the best 8 advance to the
+// Round of 32. Same tiebreak chain as the group tables (pts, gd, gf, name).
+function renderThirdPlace(){
+  const box=$("thirdPlaceTable");
+  if(!box)return;
+  const thirds=[];
+  "ABCDEFGHIJKL".split("").forEach(g=>{
+    const t=groupStandings.get(g);
+    if(t&&t[2])thirds.push({...t[2],group:g});
+  });
+  if(thirds.length<12){box.innerHTML="";return;} // standings not ready yet
+  thirds.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.name.localeCompare(b.name));
+  const rows=thirds.map((t,i)=>{
+    const cls=(i<8?"q":"")+(i===7?" cut":"");
+    const flagImg=t.flag?'<img src="'+t.flag+'" alt="">':"";
+    return'<tr'+(cls.trim()?' class="'+cls.trim()+'"':"")+'>'
+      +'<td class="pos">'+(i+1)+'</td>'
+      +'<td class="grp"><span style="color:'+GROUP_COLORS[t.group]+'">'+t.group+'</span></td>'
+      +'<td class="flag">'+flagImg+'</td>'
+      +'<td class="tn">'+t.name+'</td>'
+      +'<td class="num">'+t.mp+'</td><td class="num">'+t.w+'</td><td class="num">'+t.d+'</td><td class="num">'+t.l+'</td>'
+      +'<td class="num">'+(t.gd>0?"+":"")+t.gd+'</td>'
+      +'<td class="pts">'+t.pts+'</td></tr>';
+  }).join("");
+  box.innerHTML='<table class="gc-standings tp-table"><thead><tr>'
+    +'<th class="pos"></th><th>Grp</th><th class="flag"></th><th style="text-align:left">Team</th>'
+    +'<th title="Played">MP</th><th title="Won">W</th><th title="Drawn">D</th><th title="Lost">L</th>'
+    +'<th title="Goal difference">GD</th><th title="Points">Pts</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
 function standingsTableRows(teams,qualify){
