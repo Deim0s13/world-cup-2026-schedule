@@ -236,7 +236,9 @@ button{font-family:inherit;cursor:pointer}
 .m-home{text-align:right;min-width:0}
 .m-away{text-align:left;min-width:0}
 .m-home b,.m-away b{font-size:15px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m-home .scorers,.m-away .scorers{font-family:var(--font-mono);font-size:10px;font-weight:400;color:var(--chalk-faint);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+/* scorers wrap onto multiple lines so high-scoring games (e.g. 7 goals) show
+   every scorer; the grid row grows to fit and stays vertically centred */
+.m-home .scorers,.m-away .scorers{font-family:var(--font-mono);font-size:10px;font-weight:400;color:var(--chalk-faint);display:block;white-space:normal;line-height:1.6;margin-top:2px}
 .m-score{
   text-align:center;
   font-family:var(--font-mono);
