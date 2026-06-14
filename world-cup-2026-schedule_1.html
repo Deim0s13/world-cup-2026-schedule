@@ -770,6 +770,14 @@ function parseScorers(v){
   return v.split(",").map(s=>s.trim()).filter(Boolean);
 }
 
+// Goal-scorer surname for compact display. ESPN's shortName is "J. Quiñones";
+// stripping the leading initial(s) yields "Quiñones" while keeping particles
+// ("V. van Dijk" → "van Dijk"). Falls back to displayName, then the raw value.
+function surnameOf(ath){
+  const s=(ath?.shortName||ath?.displayName||"").trim();
+  return s.replace(/^(\p{Lu}\.\s*)+/u,"").trim()||s;
+}
+
 async function fetchScores(){
   try{
     const res=await fetch("/scores",{cache:"no-store"});
@@ -801,9 +809,9 @@ async function fetchScores(){
       const homeId=homeComp.team.id;
       const goals=(comp.details||[]).filter(d=>d.scoringPlay);
       const homeScorers=goals.filter(d=>d.team?.id===homeId)
-        .map(d=>(d.athletesInvolved?.[0]?.displayName||"")+" "+d.clock?.displayValue).map(s=>s.trim()).filter(Boolean);
+        .map(d=>(surnameOf(d.athletesInvolved?.[0])+" "+(d.clock?.displayValue||"")).trim()).filter(Boolean);
       const awayScorers=goals.filter(d=>d.team?.id&&d.team.id!==homeId)
-        .map(d=>(d.athletesInvolved?.[0]?.displayName||"")+" "+d.clock?.displayValue).map(s=>s.trim()).filter(Boolean);
+        .map(d=>(surnameOf(d.athletesInvolved?.[0])+" "+(d.clock?.displayValue||"")).trim()).filter(Boolean);
       map.set(home+"|"+away,{
         home:homeComp.score,away:awayComp.score,
         finished,live,elapsed,half,homeScorers,awayScorers,id:ev.id,
