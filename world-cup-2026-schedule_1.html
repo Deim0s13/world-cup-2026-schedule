@@ -263,7 +263,10 @@ button{font-family:inherit;cursor:pointer}
   padding:3px 10px;border-radius:6px;white-space:nowrap;color:#0c1713;
 }
 .match .num{font-family:var(--font-mono);font-size:11px;color:var(--chalk-faint);white-space:nowrap}
-.match.expandable{cursor:pointer}
+/* cursor:pointer on every descendant too — iOS Safari only fires a bubbling
+   click on a tapped element that is itself "clickable", so the inner cells
+   (team name, score, time) must carry it for the delegated handler to fire */
+.match.expandable,.match.expandable *{cursor:pointer}
 .match .m-exp{font-family:var(--font-mono);font-size:11px;color:var(--chalk-faint);transition:transform .15s;display:inline-block}
 .match.open .m-exp{transform:rotate(180deg);color:var(--chalk)}
 /* ---------- post-match detail ---------- */
@@ -628,11 +631,9 @@ $("clearAll").addEventListener("click",()=>{
   syncPills();render();
 });
 
-// Click a finished/live match to expand its post-match detail (delegated — the
-// detail panel is a sibling of .match, so clicks on it don't toggle).
-$("list").addEventListener("click",e=>{
-  const m=e.target.closest(".match.expandable");
-  if(!m)return;
+// Tap/click a finished/live match to expand its post-match detail (delegated —
+// the detail panel is a sibling of .match, so clicks on it don't toggle).
+function toggleMatch(m){
   const ev=m.dataset.ev,mid=m.dataset.mid;
   if(expandedMatches.has(mid)){
     expandedMatches.delete(mid);
@@ -641,6 +642,18 @@ $("list").addEventListener("click",e=>{
     if(!matchData.has(ev)){matchData.set(ev,"loading");fetchMatchData(ev);}
   }
   render();
+}
+$("list").addEventListener("click",e=>{
+  const m=e.target.closest(".match.expandable");
+  if(m)toggleMatch(m);
+});
+// keyboard activation for the role="button" match rows
+$("list").addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  const m=e.target.closest(".match.expandable");
+  if(!m)return;
+  e.preventDefault();
+  toggleMatch(m);
 });
 
 /* groups view */
@@ -897,6 +910,9 @@ function render(){
         m.classList.add("expandable");
         m.classList.toggle("open",isOpen);
         m.dataset.ev=sc.id;m.dataset.mid=mid;
+        m.setAttribute("role","button");
+        m.setAttribute("tabindex","0");
+        m.setAttribute("aria-expanded",isOpen?"true":"false");
       }
       const expHtml=canExpand?'<span class="m-exp">▾</span>':'';
       m.innerHTML=timeHtml+homeHtml+scoreHtml+awayHtml+'<div class="meta">'+tagFor(r)+'<span class="num">#'+String(r[0]).padStart(3,"0")+'</span>'+expHtml+'</div>'+venueHtml;
