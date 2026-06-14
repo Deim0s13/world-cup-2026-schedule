@@ -398,6 +398,10 @@ footer .mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;te
         <button class="notif-btn" id="notifBtn" title="Notifications fire only while this page is open">🔔 Match alerts</button>
       </div>
       <div class="filter-row tz-row">
+        <label class="tz-label" for="dateSel">Date</label>
+        <select class="tz-select" id="dateSel" aria-label="Filter by match date"></select>
+      </div>
+      <div class="filter-row tz-row">
         <label class="tz-label" for="tzSel">Times in</label>
         <select class="tz-select" id="tzSel" aria-label="Choose timezone"></select>
       </div>
@@ -544,7 +548,7 @@ const D=[
 [104,"F","","2026-07-19","20:00","Winner of Match 101","Winner of Match 102"]
 ];
 
-const state={stage:"",group:"",q:""};
+const state={stage:"",group:"",q:"",date:""};
 const $=id=>document.getElementById(id);
 let scores=new Map();
 const teamOverrides=new Map();
@@ -592,7 +596,8 @@ const chipRow=$("chipRow");
 
 $("search").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render();});
 $("clearAll").addEventListener("click",()=>{
-  state.stage="";state.group="";state.q="";$("search").value="";
+  state.stage="";state.group="";state.q="";state.date="";
+  $("search").value="";dateSel.value="";
   syncPills();render();
 });
 
@@ -649,8 +654,27 @@ const isLate=e=>hourIn(e)<6;
 tzSel.addEventListener("change",()=>{
   tz=tzSel.value;
   localStorage.setItem("wc26tz",tz);
-  updateTzLabels();render();
+  updateTzLabels();buildDateOptions();render();
 });
+
+/* date selector — every distinct match day; dateKey depends on tz so options
+   are rebuilt whenever the timezone changes */
+const dateSel=$("dateSel");
+function buildDateOptions(){
+  const prev=state.date;
+  const days=new Map(); // dateKey → human label
+  D.slice().sort((a,b)=>a.epoch-b.epoch).forEach(r=>{
+    const k=dateKey(r.epoch);
+    if(!days.has(k))days.set(k,fmtDateLong(r.epoch));
+  });
+  let html='<option value="">All dates</option>';
+  days.forEach((label,k)=>{html+='<option value="'+k+'">'+label+'</option>';});
+  dateSel.innerHTML=html;
+  // keep the selection if that day still exists after a tz shift, else reset
+  if(prev&&days.has(prev)){dateSel.value=prev;}
+  else{state.date="";dateSel.value="";}
+}
+dateSel.addEventListener("change",e=>{state.date=e.target.value;render();});
 function fmtElapsed(e){
   if(!e||e==="notstarted"||e==="null")return "";
   if(e==="HT"||e==="ht")return "HT";
@@ -771,6 +795,7 @@ function render(){
       const h=(ov?.home??r[5]).toLowerCase(), a=(ov?.away??r[6]).toLowerCase();
       if(!h.includes(state.q)&&!a.includes(state.q))return false;
     }
+    if(state.date&&dateKey(r.epoch)!==state.date)return false;
     return true;
   });
   rows=rows.slice().sort((a,b)=>a.epoch-b.epoch||a[0]-b[0]);
@@ -1017,7 +1042,8 @@ function renderGroups(){
     }
     card.innerHTML='<div class="gc-head" style="background:'+GROUP_COLORS[g]+'"><span class="g">Group '+g+'</span><span class="m">6 matches</span></div>'+body;
     card.addEventListener("click",()=>{
-      state.group=g;state.stage="G";state.q="";$("search").value="";
+      state.group=g;state.stage="G";state.q="";state.date="";
+      $("search").value="";dateSel.value="";
       setView("schedule");syncPills();render();
       window.scrollTo({top:document.querySelector(".controls").offsetTop-10,behavior:"smooth"});
     });
@@ -1121,6 +1147,7 @@ $("notifBtn").addEventListener("click",async()=>{
 // Core startup first — rendering and data fetching must never be blocked by
 // the optional notification setup below (which can throw on some platforms).
 updateTzLabels();
+buildDateOptions();
 render();
 // fetch flags first so computeStandings has them when scores arrive
 fetchStandings().then(()=>fetchScores());
