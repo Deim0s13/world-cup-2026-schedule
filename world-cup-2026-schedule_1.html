@@ -263,6 +263,31 @@ button{font-family:inherit;cursor:pointer}
   padding:3px 10px;border-radius:6px;white-space:nowrap;color:#0c1713;
 }
 .match .num{font-family:var(--font-mono);font-size:11px;color:var(--chalk-faint);white-space:nowrap}
+.match.expandable{cursor:pointer}
+.match .m-exp{font-family:var(--font-mono);font-size:11px;color:var(--chalk-faint);transition:transform .15s;display:inline-block}
+.match.open .m-exp{transform:rotate(180deg);color:var(--chalk)}
+/* ---------- post-match detail ---------- */
+.match-detail{
+  background:var(--pitch-2);border:2px solid var(--line);border-top:none;
+  border-radius:0 0 10px 10px;margin:-8px 0 8px;padding:16px 20px 18px;
+  display:grid;grid-template-columns:1fr 1fr;gap:24px;
+}
+.md-loading{grid-column:1 / -1;text-align:center;color:var(--chalk-faint);font-family:var(--font-mono);font-size:12px;padding:8px}
+.md-stats{display:flex;flex-direction:column;gap:10px;min-width:0}
+.md-stat-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:12px}
+.md-stat-top .md-h,.md-stat-top .md-a{font-weight:700;color:var(--chalk)}
+.md-stat-top .md-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-faint)}
+.md-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;margin-top:4px;background:var(--line)}
+.md-bar .mh{background:#4dc97b}
+.md-bar .ma{background:var(--gold)}
+.md-timeline{display:flex;flex-direction:column;gap:7px;min-width:0;max-height:340px;overflow-y:auto}
+.md-ev{display:grid;grid-template-columns:42px 18px 1fr;gap:8px;align-items:baseline;font-size:12px;line-height:1.4;padding-left:8px;border-left:2px solid transparent}
+.md-ev-home{border-left-color:#4dc97b}
+.md-ev-away{border-left-color:var(--gold)}
+.md-ev .md-m{font-family:var(--font-mono);font-size:11px;color:var(--chalk-faint);font-variant-numeric:tabular-nums}
+.md-ev .md-ic{font-size:12px;line-height:1}
+.md-ev .md-tx{color:var(--chalk-dim);min-width:0}
+@media(max-width:640px){.match-detail{grid-template-columns:1fr;gap:16px}}
 .empty{
   text-align:center;color:var(--chalk-dim);padding:70px 0;
   font-size:15px;display:none;
@@ -555,6 +580,8 @@ const teamOverrides=new Map();
 let groupStandings=new Map();
 let flagByName=new Map(); // team display name → flag URL, populated by fetchStandings
 let lineups=new Map();    // ESPN event id → {rosters:[{team,formation,xi}], subs:[{m,team,on,off}]}
+let matchData=new Map();  // ESPN event id → {home,away,stats,timeline} | "loading" | "error"
+const expandedMatches=new Set(); // match numbers (r[0], as strings) currently expanded
 
 /* build stage pills */
 const stageRow=$("stageRow");
@@ -599,6 +626,21 @@ $("clearAll").addEventListener("click",()=>{
   state.stage="";state.group="";state.q="";state.date="";
   $("search").value="";dateSel.value="";
   syncPills();render();
+});
+
+// Click a finished/live match to expand its post-match detail (delegated — the
+// detail panel is a sibling of .match, so clicks on it don't toggle).
+$("list").addEventListener("click",e=>{
+  const m=e.target.closest(".match.expandable");
+  if(!m)return;
+  const ev=m.dataset.ev,mid=m.dataset.mid;
+  if(expandedMatches.has(mid)){
+    expandedMatches.delete(mid);
+  }else{
+    expandedMatches.add(mid);
+    if(!matchData.has(ev)){matchData.set(ev,"loading");fetchMatchData(ev);}
+  }
+  render();
 });
 
 /* groups view */
@@ -847,11 +889,60 @@ function render(){
       const awayHtml='<div class="m-away"><b class="'+(aLoser?"loser":"")+'">'+awayName+'</b>'+aScorers+'</div>';
 
       const venueHtml=VENUES[r[0]]?'<div class="m-venue">'+VENUES[r[0]]+'</div>':'';
-      m.innerHTML=timeHtml+homeHtml+scoreHtml+awayHtml+'<div class="meta">'+tagFor(r)+'<span class="num">#'+String(r[0]).padStart(3,"0")+'</span></div>'+venueHtml;
+      // finished/live matches (those with an ESPN event id) can expand to post-match detail
+      const mid=String(r[0]);
+      const canExpand=!!(sc&&sc.id);
+      const isOpen=canExpand&&expandedMatches.has(mid);
+      if(canExpand){
+        m.classList.add("expandable");
+        m.classList.toggle("open",isOpen);
+        m.dataset.ev=sc.id;m.dataset.mid=mid;
+      }
+      const expHtml=canExpand?'<span class="m-exp">▾</span>':'';
+      m.innerHTML=timeHtml+homeHtml+scoreHtml+awayHtml+'<div class="meta">'+tagFor(r)+'<span class="num">#'+String(r[0]).padStart(3,"0")+'</span>'+expHtml+'</div>'+venueHtml;
       list.appendChild(m);
+      if(isOpen){
+        const dt=document.createElement("div");
+        dt.className="match-detail";
+        dt.innerHTML=renderMatchDetail(matchData.get(sc.id));
+        list.appendChild(dt);
+      }
     });
   });
   renderStrip();
+}
+
+// Fetch post-match detail (team stats + timeline) for one ESPN event, on demand.
+async function fetchMatchData(ev){
+  try{
+    const res=await fetch("/matchdata?event="+ev,{cache:"no-store"});
+    if(!res.ok){matchData.set(ev,"error");render();return;}
+    matchData.set(ev,await res.json());
+  }catch(e){matchData.set(ev,"error");}
+  render();
+}
+
+const MD_ICON={goal:'⚽',owngoal:'⚽',yellow:'🟨',red:'🟥',sub:'🔁'};
+function renderMatchDetail(data){
+  if(data==="loading"||data==null)return '<div class="md-loading">Loading match data…</div>';
+  if(data==="error")return '<div class="md-loading">Match data unavailable.</div>';
+  const stats=(data.stats||[]).map(s=>{
+    const h=parseFloat(s.home)||0,a=parseFloat(s.away)||0,tot=h+a;
+    const hp=tot>0?Math.round(h/tot*100):50;
+    return '<div class="md-stat">'
+      +'<div class="md-stat-top"><span class="md-h">'+esc(s.home??"0")+esc(s.suffix)+'</span>'
+      +'<span class="md-lab">'+esc(s.label)+'</span>'
+      +'<span class="md-a">'+esc(s.away??"0")+esc(s.suffix)+'</span></div>'
+      +'<div class="md-bar"><i class="mh" style="width:'+hp+'%"></i><i class="ma" style="width:'+(100-hp)+'%"></i></div>'
+      +'</div>';
+  }).join('');
+  const tl=(data.timeline||[]).map(e=>'<div class="md-ev md-ev-'+(e.side||'none')+'">'
+    +'<span class="md-m">'+esc(e.m)+'</span>'
+    +'<span class="md-ic">'+(MD_ICON[e.type]||'•')+'</span>'
+    +'<span class="md-tx">'+esc(e.text)+'</span></div>').join('');
+  if(!stats&&!tl)return '<div class="md-loading">No match data available yet.</div>';
+  return (stats?'<div class="md-stats">'+stats+'</div>':'<div></div>')
+    +(tl?'<div class="md-timeline">'+tl+'</div>':'<div></div>');
 }
 
 const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");

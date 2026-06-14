@@ -87,6 +87,84 @@ def fetch_lineup(event_id: str) -> bytes:
     return out
 
 
+# Curated team stats shown in the post-match detail panel: (ESPN name, label, suffix).
+MATCH_STATS = [
+    ("possessionPct", "Possession", "%"),
+    ("totalShots", "Shots", ""),
+    ("shotsOnTarget", "Shots on target", ""),
+    ("wonCorners", "Corners", ""),
+    ("foulsCommitted", "Fouls", ""),
+    ("offsides", "Offsides", ""),
+    ("yellowCards", "Yellow cards", ""),
+    ("redCards", "Red cards", ""),
+    ("totalPasses", "Passes", ""),
+    ("saves", "Saves", ""),
+]
+# ESPN keyEvent type text → our timeline icon type.
+TIMELINE_TYPES = {
+    "Goal": "goal", "Goal - Header": "goal", "Goal - Penalty": "goal",
+    "Penalty - Scored": "goal", "Own Goal": "owngoal",
+    "Yellow Card": "yellow", "Red Card": "red",
+    "Substitution": "sub",
+}
+
+
+def fetch_matchdata(event_id: str) -> bytes:
+    """Slim the ESPN summary to post-match detail: team stats + event timeline.
+    Reuses the cached raw summary (shared with fetch_lineup)."""
+    cache_key = f"matchdata:{event_id}"
+    with _cache_lock:
+        entry = _cache.get(cache_key)
+        if entry and time.time() - entry["ts"] < CACHE_TTL:
+            return entry["data"]
+
+    raw = fetch_url(f"{SUMMARY_BASE}?event={event_id}", f"summary:{event_id}")
+    d = json.loads(raw)
+
+    comp = (d.get("header", {}).get("competitions") or [{}])[0]
+    home_id = away_id = None
+    home_name = away_name = None
+    for c in comp.get("competitors", []):
+        tid = str(c.get("id") or c.get("team", {}).get("id") or "")
+        if c.get("homeAway") == "home":
+            home_id, home_name = tid, c.get("team", {}).get("displayName")
+        else:
+            away_id, away_name = tid, c.get("team", {}).get("displayName")
+
+    box = {
+        str(t.get("team", {}).get("id")): {s.get("name"): s.get("displayValue") for s in t.get("statistics", [])}
+        for t in d.get("boxscore", {}).get("teams", [])
+    }
+    hs, as_ = box.get(home_id, {}), box.get(away_id, {})
+    stats = [
+        {"label": label, "suffix": suffix, "home": hs.get(name), "away": as_.get(name)}
+        for name, label, suffix in MATCH_STATS
+        if hs.get(name) is not None or as_.get(name) is not None
+    ]
+
+    timeline = []
+    for e in d.get("keyEvents", []):
+        ty = TIMELINE_TYPES.get(e.get("type", {}).get("text", ""))
+        if not ty:
+            continue
+        tid = str(e.get("team", {}).get("id") or "")
+        side = "home" if tid == home_id else "away" if tid == away_id else ""
+        timeline.append({
+            "m": e.get("clock", {}).get("displayValue"),
+            "type": ty,
+            "side": side,
+            "text": e.get("text", ""),
+        })
+
+    out = json.dumps({
+        "home": home_name, "away": away_name,
+        "stats": stats, "timeline": timeline,
+    }).encode()
+    with _cache_lock:
+        _cache[cache_key] = {"data": out, "ts": time.time()}
+    return out
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
@@ -117,6 +195,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._send_json(data)
             except Exception as e:
                 self.send_error(502, f"Lineup proxy error: {e}")
+        elif self.path.startswith("/matchdata"):
+            event_id = (parse_qs(urlparse(self.path).query).get("event") or [""])[0]
+            if not event_id.isdigit():
+                self.send_error(400, "Missing or invalid event id")
+                return
+            try:
+                data = fetch_matchdata(event_id)
+                self._send_json(data)
+            except Exception as e:
+                self.send_error(502, f"Matchdata proxy error: {e}")
         else:
             super().do_GET()
 
