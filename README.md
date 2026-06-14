@@ -13,12 +13,13 @@ A single-file interactive wallchart for all 104 matches of the 2026 FIFA World C
 - **Click any finished or in-play match to expand a post-match detail panel** — a team-stat comparison (possession, shots, shots on target, corners, fouls, offsides, cards, passes, saves) shown as two-tone bars, plus a full event timeline of goals, cards, and substitutions
 - Knockout stage team names update automatically once teams qualify — placeholder labels (e.g. "Winner Group A") are replaced with real country names as the API confirms them
 - In-play matches show a live score with pulsing indicator and current minute
-- Full-time matches show the final score with FT stamp, losing team dimmed, and goal scorers listed under each team name
+- Full-time matches show the final score with FT stamp, losing team dimmed, and goal scorers (surname + minute) listed under each team name — the list wraps so even high-scoring games show every scorer
 - Venue (city · stadium) displayed for every match
 - Filter by group, stage, team search, or **match day** (date selector listing every day with fixtures, timezone-aware)
 - Timezone conversion — remembers your preference via localStorage
 - Late-night kick-off indicator (☾)
 - Group standings computed live from match results (MP, W, D, L, GD, Pts) with flags — visible as a table in the Groups view and as an inline strip above the schedule when a group filter is active; top 2 qualification places highlighted
+- **Best third-placed teams table** at the bottom of the Groups view — ranks all 12 third-placed teams across groups (the 8 best advance to the Round of 32), with the qualifying top 8 highlighted and a cut line marking the boundary; updates live as group games finish
 - Opt-in match alerts — browser notification 15 minutes before each kick-off (requires page to be open; desktop and installed-PWA only, and automatically hidden where the browser doesn't expose notifications, e.g. mobile Safari)
 - Installable as a PWA on iOS, Android, and desktop — add to home screen for a full-screen app experience
 
