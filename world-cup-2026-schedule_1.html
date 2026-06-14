@@ -988,6 +988,9 @@ function renderStrip(){
 }
 
 /* ---------- notifications ---------- */
+// iOS WebKit doesn't expose Notification to regular web pages (PWA-only since
+// iOS 16.4). Touching it unguarded throws and kills the rest of the script.
+const HAS_NOTIFS="Notification" in window;
 let notifTimers=[];
 let notifsEnabled=localStorage.getItem("wc26_notifs")==="on";
 
@@ -1008,7 +1011,7 @@ function cancelNotifications(){
 
 function scheduleNotifications(){
   cancelNotifications();
-  if(!notifsEnabled||Notification.permission!=="granted")return;
+  if(!HAS_NOTIFS||!notifsEnabled||Notification.permission!=="granted")return;
   const now=Date.now();
   const FIFTEEN=15*60*1000;
   const HORIZON=48*60*60*1000;
@@ -1021,6 +1024,7 @@ function scheduleNotifications(){
 function updateNotifBtn(){
   const btn=$("notifBtn");
   if(!btn)return;
+  if(!HAS_NOTIFS){btn.style.display="none";return;}
   if(Notification.permission==="denied"){
     btn.textContent="🔕 Blocked";
     btn.title="Enable notifications in your browser settings";
@@ -1037,6 +1041,7 @@ function updateNotifBtn(){
 }
 
 $("notifBtn").addEventListener("click",async()=>{
+  if(!HAS_NOTIFS)return;
   if(Notification.permission==="denied")return;
   if(Notification.permission==="default"){
     const result=await Notification.requestPermission();
@@ -1048,16 +1053,18 @@ $("notifBtn").addEventListener("click",async()=>{
   updateNotifBtn();
 });
 
-// restore on load
-if(Notification.permission==="granted"&&notifsEnabled)scheduleNotifications();
-updateNotifBtn();
-
+// Core startup first — rendering and data fetching must never be blocked by
+// the optional notification setup below (which can throw on some platforms).
 updateTzLabels();
 render();
 // fetch flags first so computeStandings has them when scores arrive
 fetchStandings().then(()=>fetchScores());
 setInterval(fetchScores,2*60*1000);
 setInterval(fetchStandings,30*60*1000); // flags rarely change
+
+// restore notification state on load (optional — guarded for platforms without Notification)
+if(HAS_NOTIFS&&Notification.permission==="granted"&&notifsEnabled)scheduleNotifications();
+updateNotifBtn();
 
 // iOS bfcache: when navigating back, Safari restores the frozen page state.
 // Timers were paused, scores are stale, and the view may have been left on Groups.
