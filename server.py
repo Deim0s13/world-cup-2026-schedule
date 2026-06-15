@@ -5,11 +5,14 @@ Serves static files and proxies:
   /scores            → ESPN scoreboard (live scores, results)
   /flags             → worldcup26.ir (team flags)
   /lineup?event=ID   → ESPN match summary, slimmed to XI + formation + subs
+  /matchdata?event=ID→ ESPN match summary, slimmed to stats + timeline
+  /leaders           → tournament leaders (top scorers, assists, cards) aggregated from ESPN
 Usage: python3 server.py [port]   (default port: 8191)
 """
 import http.server, subprocess, os, sys, time, threading, logging, json
 from datetime import date
 from urllib.parse import urlparse, parse_qs
+from concurrent.futures import ThreadPoolExecutor
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8191
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -165,6 +168,77 @@ def fetch_matchdata(event_id: str) -> bytes:
     return out
 
 
+LEADERS_TTL = 1800  # seconds — tournament stats change slowly, viewed infrequently
+
+
+def fetch_leaders() -> bytes:
+    """Aggregate tournament leaders (top scorers, assists, yellow/red cards) from
+    ESPN match summaries. Played + in-progress matches only; summaries are fetched
+    concurrently and share the per-event cache used by /lineup and /matchdata."""
+    cache_key = "leaders"
+    with _cache_lock:
+        entry = _cache.get(cache_key)
+        if entry and time.time() - entry["ts"] < LEADERS_TTL:
+            return entry["data"]
+
+    today = date.today().strftime("%Y%m%d")
+    sb = json.loads(fetch_url(f"{ESPN_BASE}?dates={TOURNAMENT_START}-{today}", "espn"))
+    event_ids = [
+        ev["id"] for ev in sb.get("events", [])
+        if (ev.get("competitions") or [{}])[0].get("status", {}).get("type", {}).get("state") in ("in", "post")
+    ]
+
+    def summary(eid):
+        try:
+            return json.loads(fetch_url(f"{SUMMARY_BASE}?event={eid}", f"summary:{eid}"))
+        except Exception:
+            return None
+
+    # player id -> {name, team, goals, assists, yellows, reds}
+    players = {}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for d in pool.map(summary, event_ids):
+            if not d:
+                continue
+            for ros in d.get("rosters", []):
+                team = ros.get("team", {}).get("displayName")
+                for p in ros.get("roster", []):
+                    st = {s.get("name"): s.get("value") for s in p.get("stats", [])}
+                    ath = p.get("athlete", {})
+                    aid = ath.get("id") or ath.get("displayName")
+                    if aid is None:
+                        continue
+                    rec = players.setdefault(aid, {
+                        "name": ath.get("displayName"), "team": team,
+                        "goals": 0, "assists": 0, "yellows": 0, "reds": 0,
+                    })
+                    rec["goals"] += int(st.get("totalGoals") or 0)
+                    rec["assists"] += int(st.get("goalAssists") or 0)
+                    rec["yellows"] += int(st.get("yellowCards") or 0)
+                    rec["reds"] += int(st.get("redCards") or 0)
+
+    vals = list(players.values())
+    scorers = sorted([p for p in vals if p["goals"]],
+                     key=lambda p: (-p["goals"], -p["assists"], p["name"] or ""))[:15]
+    assists = sorted([p for p in vals if p["assists"]],
+                     key=lambda p: (-p["assists"], -p["goals"], p["name"] or ""))[:15]
+    yellows = sorted([p for p in vals if p["yellows"]],
+                     key=lambda p: (-p["yellows"], p["name"] or ""))[:15]
+    reds = sorted([p for p in vals if p["reds"]],
+                  key=lambda p: (-p["reds"], p["name"] or ""))[:15]
+
+    pick = lambda p, *keys: {k: p[k] for k in ("name", "team", *keys)}
+    out = json.dumps({
+        "scorers": [pick(p, "goals", "assists") for p in scorers],
+        "assists": [pick(p, "assists", "goals") for p in assists],
+        "yellows": [pick(p, "yellows") for p in yellows],
+        "reds": [pick(p, "reds") for p in reds],
+    }).encode()
+    with _cache_lock:
+        _cache[cache_key] = {"data": out, "ts": time.time()}
+    return out
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
@@ -205,6 +279,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._send_json(data)
             except Exception as e:
                 self.send_error(502, f"Matchdata proxy error: {e}")
+        elif self.path == "/leaders":
+            try:
+                data = fetch_leaders()
+                self._send_json(data)
+            except Exception as e:
+                self.send_error(502, f"Leaders proxy error: {e}")
         else:
             super().do_GET()
 

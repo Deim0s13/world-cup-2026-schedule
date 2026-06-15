@@ -343,6 +343,14 @@ button{font-family:inherit;cursor:pointer}
 #thirdPlaceTable{background:var(--pitch-2);border:1px solid var(--line);border-radius:var(--radius);padding:6px 4px}
 .tp-table td.grp,.tp-table th:nth-child(2){text-align:center;font-weight:700;width:24px}
 .gc-standings tr.cut td{border-bottom:2px solid rgba(77,201,123,.5)}
+/* tournament stats view (leaders) */
+.stats-view{display:none;padding:24px 0 60px}
+.leaders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.leader-card{background:var(--pitch-2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px 10px}
+.leader-card h3{font-family:var(--font-display);font-size:17px;color:var(--chalk);margin-bottom:10px}
+.leader-card .gc-standings td.tn{max-width:none;white-space:normal;color:var(--chalk)}
+.lt-team{display:block;color:var(--chalk-faint);font-family:var(--font-mono);font-size:9px;margin-top:1px;letter-spacing:.04em}
+.leaders-loading,.leaders-empty{color:var(--chalk-faint);font-family:var(--font-mono);font-size:12px;padding:6px 2px}
 /* inline standings strip above schedule */
 .standings-strip{display:none;margin-bottom:14px;background:var(--pitch-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 .standings-strip table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px}
@@ -425,6 +433,7 @@ footer .mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;te
     <div class="views" role="tablist" aria-label="View">
       <button class="view-btn on" id="viewSchedule" role="tab" aria-selected="true">Schedule</button>
       <button class="view-btn" id="viewGroups" role="tab" aria-selected="false">Groups</button>
+      <button class="view-btn" id="viewStats" role="tab" aria-selected="false">Stats</button>
     </div>
     <div id="schedControls">
       <div class="filter-row" id="stageRow" aria-label="Filter by stage"></div>
@@ -463,6 +472,9 @@ footer .mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;te
       <p class="tp-note">Top 2 in every group qualify automatically; the 8 best of the 12 third-placed teams join them in the Round of 32. Updates as group games finish.</p>
       <div id="thirdPlaceTable"></div>
     </section>
+  </section>
+  <section class="stats-view" id="statsView" aria-label="Tournament statistics">
+    <div id="leadersBox"></div>
   </section>
 </main>
 
@@ -599,6 +611,8 @@ let flagByName=new Map(); // team display name → flag URL, populated by fetchS
 let lineups=new Map();    // ESPN event id → {rosters:[{team,formation,xi}], subs:[{m,team,on,off}]}
 let matchData=new Map();  // ESPN event id → {home,away,stats,timeline} | "loading" | "error"
 const expandedMatches=new Set(); // match numbers (r[0], as strings) currently expanded
+let leaders=null;         // {scorers,assists,yellows,reds} from /leaders, or null
+let leadersLoading=false;
 
 /* build stage pills */
 const stageRow=$("stageRow");
@@ -680,18 +694,23 @@ renderGroups();
 
 /* view toggle */
 function setView(v){
-  const sched=v==="schedule";
+  const sched=v==="schedule", groups=v==="groups", stats=v==="stats";
   $("viewSchedule").classList.toggle("on",sched);
-  $("viewGroups").classList.toggle("on",!sched);
+  $("viewGroups").classList.toggle("on",groups);
+  $("viewStats").classList.toggle("on",stats);
   $("viewSchedule").setAttribute("aria-selected",sched);
-  $("viewGroups").setAttribute("aria-selected",!sched);
+  $("viewGroups").setAttribute("aria-selected",groups);
+  $("viewStats").setAttribute("aria-selected",stats);
   $("list").style.display=sched?"block":"none";
   $("schedControls").style.display=sched?"block":"none";
-  $("groupsView").style.display=sched?"none":"block";
+  $("groupsView").style.display=groups?"block":"none";
+  $("statsView").style.display=stats?"block":"none";
   if(sched)render();else $("empty").style.display="none";
+  if(stats)fetchLeaders();
 }
 $("viewSchedule").addEventListener("click",()=>setView("schedule"));
 $("viewGroups").addEventListener("click",()=>setView("groups"));
+$("viewStats").addEventListener("click",()=>setView("stats"));
 
 /* ---- timezone handling ----
    Source schedule is Irish time; the whole tournament falls inside
@@ -1176,6 +1195,48 @@ function renderThirdPlace(){
     +'<th title="Played">MP</th><th title="Won">W</th><th title="Drawn">D</th><th title="Lost">L</th>'
     +'<th title="Goal difference">GD</th><th title="Points">Pts</th>'
     +'</tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+// Tournament leaders (top scorers, assists, cards) aggregated server-side from
+// ESPN by /leaders. Fetched on demand when the Stats tab opens (cached ~30 min
+// server-side) and refreshed on a slow timer.
+async function fetchLeaders(){
+  if(leadersLoading)return;
+  leadersLoading=true;
+  if(!leaders)renderLeaders(); // show loading state on first open
+  try{
+    const res=await fetch("/leaders",{cache:"no-store"});
+    if(res.ok)leaders=await res.json();
+  }catch(e){console.warn("Leaders fetch failed:",e);}
+  leadersLoading=false;
+  renderLeaders();
+}
+setInterval(()=>{if($("statsView")&&$("statsView").style.display!=="none")fetchLeaders();},30*60*1000);
+
+function renderLeaders(){
+  const box=$("leadersBox");
+  if(!box)return;
+  if(!leaders){
+    box.innerHTML='<div class="leaders-loading">'+(leadersLoading?"Crunching tournament stats…":"Stats unavailable.")+'</div>';
+    return;
+  }
+  const flagFor=team=>{const f=flagByName.get(normName(team||""));return f?'<img src="'+f+'" alt="">':"";};
+  const tbl=(rows,cols)=>{
+    if(!rows||!rows.length)return '<p class="leaders-empty">None yet.</p>';
+    return '<table class="gc-standings"><thead><tr><th class="pos"></th><th class="flag"></th>'
+      +'<th style="text-align:left">Player</th>'+cols.map(c=>'<th>'+c.label+'</th>').join('')
+      +'</tr></thead><tbody>'
+      +rows.map((p,i)=>'<tr><td class="pos">'+(i+1)+'</td><td class="flag">'+flagFor(p.team)+'</td>'
+        +'<td class="tn">'+esc(p.name)+'<span class="lt-team">'+esc(p.team)+'</span></td>'
+        +cols.map((c,ci)=>'<td class="'+(ci===0?"pts":"num")+'">'+(p[c.key]??0)+'</td>').join('')
+        +'</tr>').join('')+'</tbody></table>';
+  };
+  box.innerHTML='<div class="leaders-grid">'
+    +'<div class="leader-card"><h3>Top scorers</h3>'+tbl(leaders.scorers,[{key:"goals",label:"G"},{key:"assists",label:"A"}])+'</div>'
+    +'<div class="leader-card"><h3>Most assists</h3>'+tbl(leaders.assists,[{key:"assists",label:"A"},{key:"goals",label:"G"}])+'</div>'
+    +'<div class="leader-card"><h3>Yellow cards</h3>'+tbl(leaders.yellows,[{key:"yellows",label:"YC"}])+'</div>'
+    +'<div class="leader-card"><h3>Red cards</h3>'+tbl(leaders.reds,[{key:"reds",label:"RC"}])+'</div>'
+    +'</div>';
 }
 
 function standingsTableRows(teams,qualify){
