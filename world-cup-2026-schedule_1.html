@@ -86,6 +86,7 @@ button{font-family:inherit;cursor:pointer}
 .kickoff .k-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--chalk-faint)}
 .kickoff .k-time{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--chalk);font-variant-numeric:tabular-nums}
 .kickoff .k-match{font-size:13px;color:var(--chalk-dim)}
+.kickoff .k-matches{display:flex;flex-direction:column;gap:3px}
 
 /* ---------- live banner (expanded) ---------- */
 .kickoff.live{display:block;padding:16px 20px}
@@ -1113,11 +1114,16 @@ function updateBanner(){
   const ms=next.epoch-now;
   const dd=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5),mm=Math.floor(ms%36e5/6e4),ss=Math.floor(ms%6e4/1e3);
   const tStr=(dd>0?dd+"d ":"")+String(hh).padStart(2,"0")+"h "+String(mm).padStart(2,"0")+"m "+String(ss).padStart(2,"0")+"s";
-  const nh=teamOverrides.get(next[0])?.home??next[5];
-  const na=teamOverrides.get(next[0])?.away??next[6];
+  // show every match sharing this kickoff time (final group games run in pairs)
+  const upcoming=D.filter(r=>r.epoch===next.epoch).sort((a,b)=>a[0]-b[0]);
+  const matchLines=upcoming.map(r=>{
+    const nh=teamOverrides.get(r[0])?.home??r[5];
+    const na=teamOverrides.get(r[0])?.away??r[6];
+    return '<span class="k-match">Match '+r[0]+' · '+nh+' v '+na+' · '+fmtDateShort(r.epoch)+', '+fmtTime(r.epoch)+'</span>';
+  }).join('');
   el.innerHTML='<span class="k-label">Next kick-off in</span>'
     +'<span class="k-time">'+tStr+'</span>'
-    +'<span class="k-match">Match '+next[0]+' · '+nh+' v '+na+' · '+fmtDateShort(next.epoch)+', '+fmtTime(next.epoch)+'</span>';
+    +'<span class="k-matches">'+matchLines+'</span>';
 }
 updateBanner();setInterval(updateBanner,1000);
 
