@@ -1167,9 +1167,63 @@ function computeStandings(){
     result.set(letter,teams);
   });
   groupStandings=result;
+  populateKnockoutFromStandings();
   renderGroups();
   renderStrip();
   renderThirdPlace();
+}
+
+// Populate R32 teams from final group standings. The bracket is deterministic once
+// groups complete: winners/runners-up are fixed, and the 8 best third-place teams
+// qualify. ESPN API doesn't expose this until matches are imminent, so we compute it.
+function populateKnockoutFromStandings(){
+  // Collect all finished groups and their qualified teams
+  const qualifiedWinners=new Map(), qualifiedRunnerups=new Map();
+  groupStandings.forEach((teams,letter)=>{
+    if(teams.length>=2){
+      qualifiedWinners.set(`Winner Group ${letter}`,teams[0].name);
+      qualifiedRunnerups.set(`Runner-up Group ${letter}`,teams[1].name);
+    }
+  });
+
+  // Collect and rank all third-place teams (best 8 advance). Same tiebreak as standings.
+  const thirdPlaceTeams=[];
+  "ABCDEFGHIJKL".split("").forEach(g=>{
+    const teams=groupStandings.get(g);
+    if(teams&&teams[2])thirdPlaceTeams.push({name:teams[2].name,group:g,pts:teams[2].pts,gd:teams[2].gd,gf:teams[2].gf});
+  });
+  thirdPlaceTeams.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.name.localeCompare(b.name));
+  const qualifyingThirdPlace=thirdPlaceTeams.slice(0,8);
+  const assignedThirdPlace=new Set(); // Track which 3rd-place teams have been assigned
+
+  // Populate all R32 matches with actual team names
+  D.forEach(r=>{
+    if(r[1]!=="R32")return;
+    let home=r[5], away=r[6];
+
+    // Replace winner/runner-up placeholders
+    if(qualifiedWinners.has(home))home=qualifiedWinners.get(home);
+    if(qualifiedRunnerups.has(home))home=qualifiedRunnerups.get(home);
+    if(qualifiedWinners.has(away))away=qualifiedWinners.get(away);
+    if(qualifiedRunnerups.has(away))away=qualifiedRunnerups.get(away);
+
+    // Replace third-place placeholders. Format: "3rd place — Group A/B/C/D/F" means one of the
+    // best third-place teams from groups A, B, C, D, F. Find the highest-ranked team that's
+    // still available (not yet assigned to another match).
+    if(home.startsWith("3rd place — ")){
+      const groups=home.split(" — ")[1].split("/");
+      const candidate=qualifyingThirdPlace.find(t=>!assignedThirdPlace.has(t.name)&&groups.includes(t.group));
+      if(candidate){home=candidate.name;assignedThirdPlace.add(candidate.name);}
+    }
+    if(away.startsWith("3rd place — ")){
+      const groups=away.split(" — ")[1].split("/");
+      const candidate=qualifyingThirdPlace.find(t=>!assignedThirdPlace.has(t.name)&&groups.includes(t.group));
+      if(candidate){away=candidate.name;assignedThirdPlace.add(candidate.name);}
+    }
+
+    // Store the resolved team names
+    if(home!==r[5]||away!==r[6])teamOverrides.set(r[0],{home,away});
+  });
 }
 
 // Cross-group ranking of the 12 third-placed teams; the best 8 advance to the
