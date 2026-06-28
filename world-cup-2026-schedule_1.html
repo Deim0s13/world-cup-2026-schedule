@@ -1167,44 +1167,9 @@ function computeStandings(){
     result.set(letter,teams);
   });
   groupStandings=result;
-  populateKnockoutQualifiers();
   renderGroups();
   renderStrip();
   renderThirdPlace();
-}
-
-// Populate knockout team names from group winners/runners-up as groups complete
-function populateKnockoutQualifiers(){
-  // Find which groups are fully finished (all 3 matches complete)
-  const completed=new Set();
-  D.filter(r=>r[1]==="G").forEach(gMatch=>{
-    const sc=scores.get(normName(gMatch[5])+"|"+normName(gMatch[6]))
-      ??scores.get(normName(gMatch[6])+"|"+normName(gMatch[5]));
-    if(sc?.finished){
-      const letter=gMatch[2];
-      // count how many group matches are finished
-      const groupMatches=D.filter(r=>r[1]==="G"&&r[2]===letter);
-      const finishedCount=groupMatches.filter(m=>{
-        const s=scores.get(normName(m[5])+"|"+normName(m[6]))??scores.get(normName(m[6])+"|"+normName(m[5]));
-        return s?.finished;
-      }).length;
-      if(finishedCount===groupMatches.length)completed.add(letter);
-    }
-  });
-  // For each completed group, populate Round of 32 matches with actual winners/runners-up
-  completed.forEach(letter=>{
-    const standing=groupStandings.get(letter);
-    if(!standing||standing.length<2)return;
-    const winner=standing[0].name, runnerup=standing[1].name;
-    // Find all R32 matches that reference this group and populate them
-    D.forEach(r=>{
-      if(r[1]!=="R32")return;
-      if(r[5]===`Winner Group ${letter}`)teamOverrides.set(r[0],{...(teamOverrides.get(r[0])??{}),home:winner});
-      if(r[6]===`Winner Group ${letter}`)teamOverrides.set(r[0],{...(teamOverrides.get(r[0])??{}),away:winner});
-      if(r[5]===`Runner-up Group ${letter}`)teamOverrides.set(r[0],{...(teamOverrides.get(r[0])??{}),home:runnerup});
-      if(r[6]===`Runner-up Group ${letter}`)teamOverrides.set(r[0],{...(teamOverrides.get(r[0])??{}),away:runnerup});
-    });
-  });
 }
 
 // Cross-group ranking of the 12 third-placed teams; the best 8 advance to the
