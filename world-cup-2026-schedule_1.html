@@ -1176,8 +1176,16 @@ function computeStandings(){
 // Populate R32 teams from final group standings. The bracket is deterministic once
 // groups complete: winners/runners-up are fixed, and the 8 best third-place teams
 // qualify. ESPN API doesn't expose this until matches are imminent, so we compute it.
+//
+// Third-placed teams follow FIFA's fixed allocation table, which depends on WHICH
+// eight groups' third-placed teams qualify (one of 495 combinations). For this
+// tournament the qualifiers are groups B, D, E, F, I, J, K, L, and each R32 slot
+// draws its third-placed team from a specific group per that combination — NOT
+// simply the best-ranked eligible team. (Source: official 2026 R32 bracket.)
+const THIRD_PLACE_SLOT={74:"D",77:"F",79:"E",80:"K",81:"B",82:"I",85:"J",87:"L"};
+
 function populateKnockoutFromStandings(){
-  // Collect all finished groups and their qualified teams
+  // Winners and runners-up are deterministic from each group's standings
   const qualifiedWinners=new Map(), qualifiedRunnerups=new Map();
   groupStandings.forEach((teams,letter)=>{
     if(teams.length>=2){
@@ -1186,17 +1194,6 @@ function populateKnockoutFromStandings(){
     }
   });
 
-  // Collect and rank all third-place teams (best 8 advance). Same tiebreak as standings.
-  const thirdPlaceTeams=[];
-  "ABCDEFGHIJKL".split("").forEach(g=>{
-    const teams=groupStandings.get(g);
-    if(teams&&teams[2])thirdPlaceTeams.push({name:teams[2].name,group:g,pts:teams[2].pts,gd:teams[2].gd,gf:teams[2].gf});
-  });
-  thirdPlaceTeams.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.name.localeCompare(b.name));
-  const qualifyingThirdPlace=thirdPlaceTeams.slice(0,8);
-  const assignedThirdPlace=new Set(); // Track which 3rd-place teams have been assigned
-
-  // Populate all R32 matches with actual team names
   D.forEach(r=>{
     if(r[1]!=="R32")return;
     let home=r[5], away=r[6];
@@ -1207,18 +1204,14 @@ function populateKnockoutFromStandings(){
     if(qualifiedWinners.has(away))away=qualifiedWinners.get(away);
     if(qualifiedRunnerups.has(away))away=qualifiedRunnerups.get(away);
 
-    // Replace third-place placeholders. Format: "3rd place — Group A/B/C/D/F" means one of the
-    // best third-place teams from groups A, B, C, D, F. Find the highest-ranked team that's
-    // still available (not yet assigned to another match).
-    if(home.startsWith("3rd place — ")){
-      const groups=home.split(" — ")[1].split("/");
-      const candidate=qualifyingThirdPlace.find(t=>!assignedThirdPlace.has(t.name)&&groups.includes(t.group));
-      if(candidate){home=candidate.name;assignedThirdPlace.add(candidate.name);}
-    }
-    if(away.startsWith("3rd place — ")){
-      const groups=away.split(" — ")[1].split("/");
-      const candidate=qualifyingThirdPlace.find(t=>!assignedThirdPlace.has(t.name)&&groups.includes(t.group));
-      if(candidate){away=candidate.name;assignedThirdPlace.add(candidate.name);}
+    // Replace the third-place placeholder using FIFA's fixed allocation for this match
+    const tpGroup=THIRD_PLACE_SLOT[r[0]];
+    if(tpGroup){
+      const third=groupStandings.get(tpGroup)?.[2]?.name;
+      if(third){
+        if(home.startsWith("3rd place — "))home=third;
+        if(away.startsWith("3rd place — "))away=third;
+      }
     }
 
     // Store the resolved team names
