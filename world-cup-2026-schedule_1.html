@@ -846,9 +846,13 @@ async function fetchScores(){
         .map(d=>(surnameOf(d.athletesInvolved?.[0])+" "+(d.clock?.displayValue||"")).trim()).filter(Boolean);
       const awayScorers=goals.filter(d=>d.team?.id&&d.team.id!==homeId)
         .map(d=>(surnameOf(d.athletesInvolved?.[0])+" "+(d.clock?.displayValue||"")).trim()).filter(Boolean);
+      // Knockout winner (ESPN flags the advancing side, so penalties resolve correctly)
+      const hs=parseInt(homeComp.score,10), as=parseInt(awayComp.score,10);
+      const winner=homeComp.winner===true?home:awayComp.winner===true?away
+        :finished&&hs>as?home:finished&&as>hs?away:null;
       map.set(home+"|"+away,{
         home:homeComp.score,away:awayComp.score,
-        finished,live,elapsed,half,homeScorers,awayScorers,id:ev.id,
+        finished,live,elapsed,half,homeScorers,awayScorers,winner,id:ev.id,
       });
       // patch knockout team names — match ESPN event to D array by epoch (±10 min)
       const evEpoch=new Date(ev.date).getTime();
@@ -1168,9 +1172,41 @@ function computeStandings(){
   });
   groupStandings=result;
   populateKnockoutFromStandings();
+  populateKnockoutWinners();
   renderGroups();
   renderStrip();
   renderThirdPlace();
+}
+
+// Resolve "Winner of Match N" / "Loser of Match N" placeholders up the knockout tree
+// (R16 → QF → SF → 3rd place → Final) as each match finishes. Processed in ascending
+// match order so a result cascades into later rounds within a single pass.
+function populateKnockoutWinners(){
+  D.filter(r=>["R16","QF","SF","3P","F"].includes(r[1])).sort((a,b)=>a[0]-b[0]).forEach(r=>{
+    const resolve=side=>{
+      let m=/^Winner of Match (\d+)$/.exec(side);
+      if(m)return resultOfMatch(+m[1])?.winner??side;
+      m=/^Loser of Match (\d+)$/.exec(side);
+      if(m)return resultOfMatch(+m[1])?.loser??side;
+      return side;
+    };
+    const cur=teamOverrides.get(r[0])||{};
+    const home=resolve(cur.home??r[5]), away=resolve(cur.away??r[6]);
+    if(home!==r[5]||away!==r[6])teamOverrides.set(r[0],{home,away});
+  });
+}
+
+// Winner/loser team names of a completed knockout match, or null if undecided.
+// Relies on the ESPN winner flag captured in the scores map (handles penalties).
+function resultOfMatch(id){
+  const row=D.find(r=>r[0]===id);
+  if(!row)return null;
+  const ov=teamOverrides.get(id)||{};
+  const home=normName(ov.home??row[5]), away=normName(ov.away??row[6]);
+  if(/^(Winner|Runner-up|3rd place|Loser)/.test(home)||/^(Winner|Runner-up|3rd place|Loser)/.test(away))return null;
+  const sc=scores.get(home+"|"+away)??scores.get(away+"|"+home);
+  if(!sc?.finished||!sc.winner)return null;
+  return {winner:sc.winner, loser:sc.winner===home?away:home};
 }
 
 // Populate R32 teams from final group standings. The bracket is deterministic once
